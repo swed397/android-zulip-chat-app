@@ -1,5 +1,6 @@
 package com.android.zulip.chat.app.ui.chanels
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,10 +8,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -20,20 +28,97 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.android.zulip.chat.app.R
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChannelsScreen() {
-    Column(modifier = Modifier
-        .padding(8.dp)
-        .fillMaxSize()) {
-        SearchBar()
-        ChanelTabs()
+    Scaffold(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize()
+            .background(Color.Blue),
+        bottomBar = { BottomNavigationBar() },
+        topBar = { SearchBar() }
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            ChanelTabs()
+        }
+    }
+}
+
+@Composable
+fun BottomNavigationBar() {
+    val selectedItem = remember { mutableStateOf(0) }
+    val items = listOf("Channels", "People", "Profile")
+    val icons = listOf(
+        R.drawable.baseline_headset_mic_24,
+        R.drawable.baseline_people_24,
+        R.drawable.baseline_self_improvement_24
+    )
+
+    NavigationBar {
+        items.forEachIndexed { index, item ->
+            NavigationBarItem(
+                selected = selectedItem.value == index,
+                onClick = { selectedItem.value = index },
+                icon = {
+                    Icon(
+                        painter = painterResource(id = icons[index]),
+                        contentDescription = item
+                    )
+                })
+        }
+    }
+}
+
+@Composable
+fun StreamsList() {
+    val data = remember {
+        listOf("1 item", "2 item", "3 item", "4 item", "5 item").toMutableStateList()
+    }
+    LazyColumn {
+        items(data) {
+            StreamListItem(it)
+            Divider(color = Color.Gray, thickness = 1.dp)
+        }
+    }
+}
+
+@Composable
+fun StreamListItem(text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .background(color = Color.Black)
+            .height(60.dp)
+    ) {
+        Text(
+            text = text,
+            fontSize = 18.sp,
+            color = Color.Green,
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(9f)
+                .wrapContentHeight()
+        )
+        Icon(
+            painter = painterResource(id = R.drawable.baseline_keyboard_arrow_down_24),
+            contentDescription = null,
+            tint = Color.Green,
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        )
     }
 }
 
@@ -61,7 +146,7 @@ fun ChanelTabs() {
 
 @Composable
 fun AllChannels() {
-    Text(text = "ALL")
+    StreamsList()
 }
 
 @Composable
@@ -112,10 +197,18 @@ fun SearchBar() {
 }
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun ChannelPreview() {
-    Column(modifier = Modifier.padding(8.dp)) {
+    Scaffold(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize()
+            .background(Color.Blue),
+        bottomBar = { BottomNavigationBar() }
+    ) {
         SearchBar()
         ChanelTabs()
     }
