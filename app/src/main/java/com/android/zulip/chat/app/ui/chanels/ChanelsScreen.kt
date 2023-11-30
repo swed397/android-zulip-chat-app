@@ -1,7 +1,10 @@
 package com.android.zulip.chat.app.ui.chanels
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -36,23 +38,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.android.zulip.chat.app.R
+import com.android.zulip.chat.app.ui.people.PeopleScreen
+import com.android.zulip.chat.app.ui.profile.ProfileScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChannelsScreen() {
-    Scaffold(
+    Column(
         modifier = Modifier
-            .padding(8.dp)
             .fillMaxSize()
             .background(Color.Blue),
-        bottomBar = { BottomNavigationBar() },
-        topBar = { SearchBar() }
-    ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            ChanelTabs()
-        }
+    ) {
+        SearchBar()
+        ChanelTabs()
     }
 }
 
@@ -66,11 +68,20 @@ fun BottomNavigationBar() {
         R.drawable.baseline_self_improvement_24
     )
 
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "Channels") {
+        composable("Channels") { ChannelsScreen() }
+        composable("People") { PeopleScreen() }
+        composable("Profile") { ProfileScreen() }
+    }
+
     NavigationBar {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 selected = selectedItem.value == index,
-                onClick = { selectedItem.value = index },
+                onClick = { navController.navigate(items[index]) },
+//                onClick = {  },
                 icon = {
                     Icon(
                         painter = painterResource(id = icons[index]),
@@ -96,11 +107,20 @@ fun StreamsList() {
 
 @Composable
 fun StreamListItem(text: String) {
+    var expanded by remember { mutableStateOf(true) }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .background(color = Color.Black)
-            .height(60.dp)
+            .animateContentSize()
+            .height(if (expanded) 60.dp else 120.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                expanded = !expanded
+            }
     ) {
         Text(
             text = text,
@@ -197,17 +217,13 @@ fun SearchBar() {
 }
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun ChannelPreview() {
-    Scaffold(
+    Column(
         modifier = Modifier
-            .padding(8.dp)
             .fillMaxSize()
             .background(Color.Blue),
-        bottomBar = { BottomNavigationBar() }
     ) {
         SearchBar()
         ChanelTabs()
