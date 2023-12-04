@@ -27,7 +27,7 @@ import com.android.zulip.chat.app.ui.profile.ProfileScreen
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
