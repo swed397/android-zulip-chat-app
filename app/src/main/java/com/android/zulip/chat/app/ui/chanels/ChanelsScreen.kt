@@ -32,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.zulip.chat.app.R
-import com.android.zulip.chat.app.ui.SearchBar
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
