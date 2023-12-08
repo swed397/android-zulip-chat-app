@@ -11,12 +11,23 @@ import javax.inject.Inject
 
 class PeopleViewModel @Inject constructor(private val userRepo: UserRepo) : ViewModel() {
 
-    private val _state = MutableStateFlow<List<PeopleModel>>(listOf())
-    val state: StateFlow<List<PeopleModel>> = _state
+    private val _state = MutableStateFlow<PeopleState>(PeopleState.OnLoading)
+    val state: StateFlow<PeopleState> = _state
 
     fun getAllUsers() {
         viewModelScope.launch {
-            _state.emit(userRepo.getAllUsers())
+            _state.emit(PeopleState.OnSuccess(userRepo.getAllUsers()))
+        }
+    }
+
+    fun searchByFilter(searchText: String) {
+        viewModelScope.launch {
+            _state.emit(
+                //ToDo Временный костыль
+                PeopleState.OnSuccess(
+                    userRepo.getAllUsers()
+                        .filter { it.name.contains(searchText, ignoreCase = true) })
+            )
         }
     }
 }

@@ -42,7 +42,7 @@ fun ChannelsScreen() {
             .fillMaxSize()
             .background(Color.Blue),
     ) {
-        SearchBar(placeHolderString = "Search...")
+//        SearchBar(placeHolderString = "Search...")
         ChanelTabs()
     }
 }
@@ -137,7 +137,7 @@ fun ChannelPreview() {
             .fillMaxSize()
             .background(Color.Blue),
     ) {
-        SearchBar("Search...")
+//        SearchBar("Search...")
         ChanelTabs()
     }
 }

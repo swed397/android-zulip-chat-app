@@ -17,6 +17,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -24,13 +26,17 @@ import com.android.zulip.chat.app.ui.chanels.ChannelsScreen
 import com.android.zulip.chat.app.ui.people.PeopleScreen
 import com.android.zulip.chat.app.ui.profile.ProfileScreen
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
+import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
+        (applicationContext.applicationContext as App).appComponent.injectMainActivity(this)
 
         setContent {
             AndroidzulipchatappTheme {
@@ -59,7 +65,7 @@ class MainActivity : ComponentActivity() {
                                 selectedItem.value = 0
                             }
                             composable("People") {
-                                PeopleScreen()
+                                PeopleScreen(peopleViewModel = viewModel(factory = viewModelFactory))
                                 selectedItem.value = 1
                             }
                             composable("Profile") {

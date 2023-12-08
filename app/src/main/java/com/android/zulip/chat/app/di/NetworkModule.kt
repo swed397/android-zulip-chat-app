@@ -5,8 +5,10 @@ import com.android.zulip.chat.app.data.network.repo.UserRepoImpl
 import com.android.zulip.chat.app.domain.UserRepo
 import dagger.Module
 import dagger.Provides
+import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -32,7 +34,7 @@ class NetworkModule {
     fun authInterceptor(): Interceptor = Interceptor { chain ->
         chain.proceed(
             chain.request().newBuilder()
-                .addHeader(AUTH_HEADER, "$AUTH_TYPE ${EMAIL}:${API_KEY}")
+                .addHeader(AUTH_HEADER, Credentials.basic(EMAIL, API_KEY))
                 .build()
         )
     }
@@ -40,10 +42,18 @@ class NetworkModule {
     @Provides
     fun okHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(authInterceptor())
+        .addNetworkInterceptor(httpLoggingInterceptor())
         .build()
 
     @Provides
     fun provideApi(retrofit: Retrofit): ZulipApi = retrofit.create(ZulipApi::class.java)
+
+    @Provides
+    fun httpLoggingInterceptor(): HttpLoggingInterceptor {
+        return HttpLoggingInterceptor().apply {
+            setLevel(HttpLoggingInterceptor.Level.BODY)
+        }
+    }
 
     @Provides
     fun providesUserRepo(): UserRepo = UserRepoImpl(provideApi(getInstance()))

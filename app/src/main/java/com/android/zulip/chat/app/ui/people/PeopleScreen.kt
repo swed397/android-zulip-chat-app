@@ -1,62 +1,110 @@
 package com.android.zulip.chat.app.ui.people
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.SubcomposeAsyncImage
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.domain.PeopleModel
 import com.android.zulip.chat.app.ui.SearchBar
 
 @Composable
 fun PeopleScreen(peopleViewModel: PeopleViewModel = viewModel()) {
-    val data by peopleViewModel.state.collectAsState()
+    val state by peopleViewModel.state.collectAsState()
+    peopleViewModel.getAllUsers()
 
-    Column(
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Magenta)
     ) {
-        SearchBar(placeHolderString = "Users...")
+        when (state) {
+            is PeopleState.OnLoading -> Preloader()
+            is PeopleState.OnSuccess -> MainState(
+                data = (state as PeopleState.OnSuccess).data,
+                onSearch = peopleViewModel::searchByFilter
+            )
+        }
+    }
+}
+
+@Composable
+fun MainState(data: List<PeopleModel>, onSearch: (String) -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        SearchBar(placeHolderString = "Users...", onClick = onSearch)
         UsersList(data)
     }
+}
+
+@Composable
+fun Preloader() {
+    CircularProgressIndicator(
+        modifier = Modifier
+            .width(64.dp),
+        color = MaterialTheme.colorScheme.secondary
+    )
 }
 
 @Composable
 fun UsersList(data: List<PeopleModel>) {
     LazyColumn {
         items(data) { item ->
-            UserListItem(name = item.name, email = item.email ?: "No email")
+            UserListItem(
+                name = item.name,
+                email = item.email ?: "No email",
+                avatarUrls = item.avatarUrl
+            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserListItem(name: String, email: String) {
+fun UserListItem(name: String, email: String, avatarUrls: String?) {
     ListItem(
         headlineText = { Text(text = name) },
         supportingText = { Text(text = email) },
         leadingContent = {
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_sentiment_satisfied_alt_24),
-                contentDescription = null
-            )
+            if (avatarUrls.isNullOrEmpty()) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_sentiment_satisfied_alt_24),
+                    contentDescription = null
+                )
+            } else
+                SubcomposeAsyncImage(
+                    model = avatarUrls,
+                    contentDescription = null,
+                    loading = { CircularProgressIndicator() },
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(percent = 50))
+                )
         }
     )
     Divider(color = Color.Gray, thickness = 1.dp)
