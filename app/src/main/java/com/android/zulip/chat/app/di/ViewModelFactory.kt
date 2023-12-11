@@ -1,15 +1,23 @@
 package com.android.zulip.chat.app.di
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisallowComposableCalls
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import javax.inject.Inject
-import javax.inject.Provider
 
-class ViewModelFactory @Inject constructor(
-    private val viewModels: MutableMap<Class<out ViewModel>, Provider<ViewModel>>
-) : ViewModelProvider.Factory {
-
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return viewModels[modelClass]!!.get() as T
+@Composable
+inline fun <reified VM : ViewModel> injectedViewModel(
+    key: String? = null,
+    crossinline viewModelInstanceCreator: @DisallowComposableCalls () -> VM
+): VM {
+    val factory = remember(key) {
+        object : ViewModelProvider.Factory {
+            override fun <VM : ViewModel> create(modelClass: Class<VM>): VM {
+                @Suppress("UNCHECKED_CAST")
+                return viewModelInstanceCreator.invoke() as VM
+            }
+        }
     }
+    return androidx.lifecycle.viewmodel.compose.viewModel(key = key, factory = factory)
 }

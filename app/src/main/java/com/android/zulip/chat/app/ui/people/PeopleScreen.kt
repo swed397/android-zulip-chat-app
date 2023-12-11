@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,7 +12,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,20 +20,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.SubcomposeAsyncImage
+import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.R
+import com.android.zulip.chat.app.di.injectedViewModel
 import com.android.zulip.chat.app.domain.PeopleModel
+import com.android.zulip.chat.app.ui.Preloader
 import com.android.zulip.chat.app.ui.SearchBar
+import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
 
 @Composable
-fun PeopleScreen(peopleViewModel: PeopleViewModel = viewModel()) {
-    val state by peopleViewModel.state.collectAsState()
-    peopleViewModel.getAllUsers()
+fun PeopleScreenHolder() {
+    val context = LocalContext.current.applicationContext
+    val viewModel = injectedViewModel {
+        (context as App).appComponent.peopleViewModelFactory.create()
+    }
 
+    val state by viewModel.state.collectAsState()
+
+    PeopleScreen(state = state, onSearch = viewModel::searchByFilter)
+}
+
+@Composable
+fun PeopleScreen(state: PeopleState, onSearch: (String) -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -43,39 +54,30 @@ fun PeopleScreen(peopleViewModel: PeopleViewModel = viewModel()) {
             .background(Color.Magenta)
     ) {
         when (state) {
-            is PeopleState.OnLoading -> Preloader()
-            is PeopleState.OnSuccess -> MainState(
-                data = (state as PeopleState.OnSuccess).data,
-                onSearch = peopleViewModel::searchByFilter
+            is PeopleState.Loading -> Preloader()
+            is PeopleState.Content -> MainState(
+                state = state,
+                onSearch = onSearch
             )
         }
     }
 }
 
 @Composable
-fun MainState(data: List<PeopleModel>, onSearch: (String) -> Unit) {
+fun MainState(state: PeopleState.Content, onSearch: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
         SearchBar(placeHolderString = "Users...", onClick = onSearch)
-        UsersList(data)
+        UsersList { state.visibleItems }
     }
 }
 
 @Composable
-fun Preloader() {
-    CircularProgressIndicator(
-        modifier = Modifier
-            .width(64.dp),
-        color = MaterialTheme.colorScheme.secondary
-    )
-}
-
-@Composable
-fun UsersList(data: List<PeopleModel>) {
+fun UsersList(data: () -> List<PeopleModel>) {
     LazyColumn {
-        items(data) { item ->
+        items(data.invoke()) { item ->
             UserListItem(
                 name = item.name,
                 email = item.email ?: "No email",
@@ -112,6 +114,30 @@ fun UserListItem(name: String, email: String, avatarUrls: String?) {
 
 @Composable
 @Preview
-fun ScreenPreview() {
-    PeopleScreen()
+private fun ScreenLoadingPreview() {
+    AndroidzulipchatappTheme {
+        PeopleScreen(
+            state = PeopleState.Loading,
+            onSearch = {}
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun ScreenContentPreview() {
+    AndroidzulipchatappTheme {
+        val items = List(3) {
+            PeopleModel(
+                id = it.toLong(),
+                name = "Name",
+                email = "Email",
+                avatarUrl = "url"
+            )
+        }
+        PeopleScreen(
+            state = PeopleState.Content(items, items),
+            onSearch = {}
+        )
+    }
 }
