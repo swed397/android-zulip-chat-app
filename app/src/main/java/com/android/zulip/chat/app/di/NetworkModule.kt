@@ -11,6 +11,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
 @Module
 class NetworkModule {
@@ -24,6 +25,7 @@ class NetworkModule {
     }
 
     @Provides
+    @Singleton
     fun getInstance(): Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
@@ -31,6 +33,7 @@ class NetworkModule {
         .build()
 
     @Provides
+    @Singleton
     fun authInterceptor(): Interceptor = Interceptor { chain ->
         chain.proceed(
             chain.request().newBuilder()
@@ -40,15 +43,18 @@ class NetworkModule {
     }
 
     @Provides
+    @Singleton
     fun okHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(authInterceptor())
         .addNetworkInterceptor(httpLoggingInterceptor())
         .build()
 
     @Provides
+    @Singleton
     fun provideApi(retrofit: Retrofit): ZulipApi = retrofit.create(ZulipApi::class.java)
 
     @Provides
+    @Singleton
     fun httpLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().apply {
             setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -56,5 +62,6 @@ class NetworkModule {
     }
 
     @Provides
+    @Singleton
     fun providesUserRepo(): UserRepo = UserRepoImpl(provideApi(getInstance()))
 }

@@ -17,18 +17,35 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.android.zulip.chat.app.domain.NavRoutes
+import com.android.zulip.chat.app.domain.NavState
+import com.android.zulip.chat.app.ui.Navigator
 import com.android.zulip.chat.app.ui.chanels.ChannelsScreen
 import com.android.zulip.chat.app.ui.people.PeopleScreenHolder
 import com.android.zulip.chat.app.ui.profile.ProfileScreen
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
 
+    @Inject
+    lateinit var navigator: Navigator
+
+    private lateinit var navController: NavHostController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        (applicationContext as App).appComponent.inject(this)
 
         setContent {
             AndroidzulipchatappTheme {
@@ -36,33 +53,34 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                    //ToDo Delete
-                    val selectedItem = remember { mutableStateOf(0) }
-                    val items = listOf("Channels", "People", "Profile")
-                    val icons = listOf(
-                        R.drawable.baseline_headset_mic_24,
-                        R.drawable.baseline_people_24,
-                        R.drawable.baseline_self_improvement_24
-                    )
-                    val navController = rememberNavController()
+                    val selectedItem =
+                        remember { mutableStateOf(NavRoutes.CHANNELS) }
+                    navController = rememberNavController()
 
                     Column(modifier = Modifier.fillMaxSize()) {
                         NavHost(
                             navController = navController,
-                            startDestination = "Channels",
+                            startDestination = NavRoutes.CHANNELS.label,
                             modifier = Modifier.weight(1f)
                         ) {
-                            composable("Channels") {
+                            composable(NavRoutes.CHANNELS.label) {
                                 ChannelsScreen()
-                                selectedItem.value = 0
+                                selectedItem.value = NavRoutes.CHANNELS
                             }
-                            composable("People") {
+                            composable(NavRoutes.PEOPLES.label) {
                                 PeopleScreenHolder()
-                                selectedItem.value = 1
+                                selectedItem.value = NavRoutes.PEOPLES
                             }
-                            composable("Profile") {
-                                ProfileScreen()
-                                selectedItem.value = 2
+                            composable(
+                                "${NavRoutes.PROFILE.label}?userId={userId}",
+                                arguments = listOf(navArgument("userId") {
+                                    defaultValue = OWN_USER_ID
+                                })
+                            ) { backStackEntry ->
+                                ProfileScreen(
+                                    backStackEntry.arguments?.getLong("userId")
+                                )
+                                selectedItem.value = NavRoutes.PROFILE
                             }
                         }
                         Row(
@@ -71,23 +89,57 @@ class MainActivity : ComponentActivity() {
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             NavigationBar {
-                                items.forEachIndexed { index, item ->
-                                    NavigationBarItem(
-                                        selected = selectedItem.value == index,
-                                        onClick = { navController.navigate(items[index]) },
-                                        icon = {
-                                            Icon(
-                                                painter = painterResource(id = icons[index]),
-                                                contentDescription = item
-                                            )
-                                        }
-                                    )
-                                }
+                                NavigationBarItem(
+                                    selected = selectedItem.value == NavRoutes.CHANNELS,
+                                    onClick = { navController.navigate(NavRoutes.CHANNELS.label) },
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(
+                                                id = R.drawable.baseline_headset_mic_24
+                                            ),
+                                            contentDescription = null
+                                        )
+                                    })
+                                NavigationBarItem(
+                                    selected = selectedItem.value == NavRoutes.PEOPLES,
+                                    onClick = { navController.navigate(NavRoutes.PEOPLES.label) },
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(
+                                                id = R.drawable.baseline_people_24
+                                            ),
+                                            contentDescription = null
+                                        )
+                                    })
+                                NavigationBarItem(
+                                    selected = selectedItem.value == NavRoutes.PROFILE,
+                                    onClick = { navController.navigate(NavRoutes.PROFILE.label) },
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(
+                                                id = R.drawable.baseline_self_improvement_24
+                                            ),
+                                            contentDescription = null
+                                        )
+                                    })
                             }
                         }
                     }
                 }
             }
+        }
+
+        lifecycleScope.launch {
+            navigator.navigateFlow.collect(this@MainActivity::onNavEvent)
+        }
+    }
+
+    private fun onNavEvent(navState: NavState) {
+        print("NAV EVENT WORKS $navState")
+        when (navState) {
+            is NavState.ChannelsNav -> println("Try nav CHANNELS")
+            is NavState.PeoplesNav -> println("TRY NAV PEOPLES")
+            is NavState.ProfileNav -> navController.navigate("${NavRoutes.PROFILE.label}?userId=${navState.id}")
         }
     }
 }

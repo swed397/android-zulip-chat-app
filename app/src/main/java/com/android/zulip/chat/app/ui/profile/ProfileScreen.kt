@@ -9,12 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(userId: Long?) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Yellow)
     ) {
         Text(text = "PROFILE SCREEN")
+        Text(text = "ID IS $userId ")
     }
 }

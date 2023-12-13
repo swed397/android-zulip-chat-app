@@ -1,6 +1,7 @@
 package com.android.zulip.chat.app.ui.people
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.R
@@ -42,11 +44,15 @@ fun PeopleScreenHolder() {
 
     val state by viewModel.state.collectAsState()
 
-    PeopleScreen(state = state, onSearch = viewModel::searchByFilter)
+    PeopleScreen(
+        state = state,
+        onSearch = viewModel::searchByFilter,
+        onNavigate = viewModel::navigate
+    )
 }
 
 @Composable
-fun PeopleScreen(state: PeopleState, onSearch: (String) -> Unit) {
+fun PeopleScreen(state: PeopleState, onSearch: (String) -> Unit, onNavigate: () -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -57,31 +63,33 @@ fun PeopleScreen(state: PeopleState, onSearch: (String) -> Unit) {
             is PeopleState.Loading -> Preloader()
             is PeopleState.Content -> MainState(
                 state = state,
-                onSearch = onSearch
+                onSearch = onSearch,
+                onNavigate = onNavigate
             )
         }
     }
 }
 
 @Composable
-fun MainState(state: PeopleState.Content, onSearch: (String) -> Unit) {
+fun MainState(state: PeopleState.Content, onSearch: (String) -> Unit, onNavigate: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
         SearchBar(placeHolderString = "Users...", onClick = onSearch)
-        UsersList { state.visibleItems }
+        UsersList(state::visibleItems, onNavigate)
     }
 }
 
 @Composable
-fun UsersList(data: () -> List<PeopleModel>) {
+fun UsersList(data: () -> List<PeopleModel>, onNavigate: () -> Unit) {
     LazyColumn {
         items(data.invoke()) { item ->
             UserListItem(
                 name = item.name,
                 email = item.email ?: "No email",
-                avatarUrls = item.avatarUrl
+                avatarUrls = item.avatarUrl,
+                onNavigate = onNavigate
             )
         }
     }
@@ -89,7 +97,7 @@ fun UsersList(data: () -> List<PeopleModel>) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserListItem(name: String, email: String, avatarUrls: String?) {
+fun UserListItem(name: String, email: String, avatarUrls: String?, onNavigate: () -> Unit) {
     ListItem(
         headlineText = { Text(text = name) },
         supportingText = { Text(text = email) },
@@ -107,7 +115,8 @@ fun UserListItem(name: String, email: String, avatarUrls: String?) {
                     modifier = Modifier
                         .clip(RoundedCornerShape(percent = 50))
                 )
-        }
+        },
+        modifier = Modifier.clickable { onNavigate.invoke() }
     )
     Divider(color = Color.Gray, thickness = 1.dp)
 }
@@ -118,7 +127,8 @@ private fun ScreenLoadingPreview() {
     AndroidzulipchatappTheme {
         PeopleScreen(
             state = PeopleState.Loading,
-            onSearch = {}
+            onSearch = {},
+            onNavigate = {}
         )
     }
 }
@@ -137,7 +147,8 @@ private fun ScreenContentPreview() {
         }
         PeopleScreen(
             state = PeopleState.Content(items, items),
-            onSearch = {}
+            onSearch = {},
+            onNavigate = {}
         )
     }
 }
