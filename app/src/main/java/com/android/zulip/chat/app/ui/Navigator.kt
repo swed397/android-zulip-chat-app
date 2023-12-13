@@ -1,6 +1,5 @@
 package com.android.zulip.chat.app.ui
 
-import com.android.zulip.chat.app.domain.NavRoutes
 import com.android.zulip.chat.app.domain.NavState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
