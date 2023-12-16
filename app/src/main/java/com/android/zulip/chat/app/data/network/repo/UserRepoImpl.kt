@@ -4,7 +4,6 @@ import com.android.zulip.chat.app.data.network.ZulipApi
 import com.android.zulip.chat.app.domain.CurrentUserModel
 import com.android.zulip.chat.app.domain.UserModel
 import com.android.zulip.chat.app.domain.UserRepo
-import com.android.zulip.chat.app.domain.ZulipUserStatus
 import javax.inject.Inject
 
 class UserRepoImpl @Inject constructor(private val zulipApi: ZulipApi) : UserRepo {
