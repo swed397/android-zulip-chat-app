@@ -29,7 +29,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.di.injectedViewModel
-import com.android.zulip.chat.app.domain.PeopleModel
+import com.android.zulip.chat.app.domain.UserModel
 import com.android.zulip.chat.app.ui.Preloader
 import com.android.zulip.chat.app.ui.SearchBar
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
@@ -51,7 +51,7 @@ fun PeopleScreenHolder() {
 }
 
 @Composable
-fun PeopleScreen(state: PeopleState, onSearch: (String) -> Unit, onNavigate: () -> Unit) {
+fun PeopleScreen(state: PeopleState, onSearch: (String) -> Unit, onNavigate: (Long) -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -70,7 +70,7 @@ fun PeopleScreen(state: PeopleState, onSearch: (String) -> Unit, onNavigate: () 
 }
 
 @Composable
-fun MainState(state: PeopleState.Content, onSearch: (String) -> Unit, onNavigate: () -> Unit) {
+fun MainState(state: PeopleState.Content, onSearch: (String) -> Unit, onNavigate: (Long) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -81,10 +81,11 @@ fun MainState(state: PeopleState.Content, onSearch: (String) -> Unit, onNavigate
 }
 
 @Composable
-fun UsersList(data: () -> List<PeopleModel>, onNavigate: () -> Unit) {
+fun UsersList(data: () -> List<UserModel>, onNavigate: (Long) -> Unit) {
     LazyColumn {
         items(data.invoke()) { item ->
             UserListItem(
+                userId = item.id,
                 name = item.name,
                 email = item.email ?: "No email",
                 avatarUrls = item.avatarUrl,
@@ -96,7 +97,13 @@ fun UsersList(data: () -> List<PeopleModel>, onNavigate: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserListItem(name: String, email: String, avatarUrls: String?, onNavigate: () -> Unit) {
+fun UserListItem(
+    userId: Long,
+    name: String,
+    email: String,
+    avatarUrls: String?,
+    onNavigate: (Long) -> Unit
+) {
     ListItem(
         headlineText = { Text(text = name) },
         supportingText = { Text(text = email) },
@@ -115,7 +122,7 @@ fun UserListItem(name: String, email: String, avatarUrls: String?, onNavigate: (
                         .clip(RoundedCornerShape(percent = 50))
                 )
         },
-        modifier = Modifier.clickable { onNavigate.invoke() }
+        modifier = Modifier.clickable { onNavigate.invoke(userId) }
     )
     Divider(color = Color.Gray, thickness = 1.dp)
 }
@@ -137,7 +144,7 @@ private fun ScreenLoadingPreview() {
 private fun ScreenContentPreview() {
     AndroidzulipchatappTheme {
         val items = List(3) {
-            PeopleModel(
+            UserModel(
                 id = it.toLong(),
                 name = "Name",
                 email = "Email",

@@ -29,6 +29,7 @@ import com.android.zulip.chat.app.ui.Navigator
 import com.android.zulip.chat.app.ui.chanels.ChannelsScreen
 import com.android.zulip.chat.app.ui.people.PeopleScreenHolder
 import com.android.zulip.chat.app.ui.profile.ProfileScreen
+import com.android.zulip.chat.app.ui.profile.ProfileScreenHolder
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
                                     defaultValue = OWN_USER_ID
                                 })
                             ) { backStackEntry ->
-                                ProfileScreen(
+                                ProfileScreenHolder(
                                     backStackEntry.arguments?.getLong("userId")
                                 )
                                 selectedItem.value = NavRoutes.PROFILE

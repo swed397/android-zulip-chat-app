@@ -27,7 +27,6 @@ class PeopleViewModel @AssistedInject constructor(
     private fun getAllUsers() {
         viewModelScope.launch {
             val data = userRepo.getAllUsers()
-
             _state.emit(PeopleState.Content(data, data))
         }
     }
@@ -45,10 +44,10 @@ class PeopleViewModel @AssistedInject constructor(
         }
     }
 
-    fun navigate() {
+    fun navigate(userId: Long) {
         println("Navigator clicked")
         viewModelScope.launch {
-            navigator.navigate(NavState.ProfileNav(111111111))
+            navigator.navigate(NavState.ProfileNav(userId))
         }
     }
 
