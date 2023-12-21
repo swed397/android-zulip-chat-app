@@ -2,7 +2,7 @@ package com.android.zulip.chat.app.ui.people
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.zulip.chat.app.domain.NavState
+import com.android.zulip.chat.app.ui.NavState
 import com.android.zulip.chat.app.domain.UserRepo
 import com.android.zulip.chat.app.ui.Navigator
 import dagger.assisted.AssistedFactory
@@ -20,8 +20,14 @@ class PeopleViewModel @AssistedInject constructor(
     val state: StateFlow<PeopleState> = _state
 
     init {
-        println(this)
         getAllUsers()
+    }
+
+    fun obtainEvent(event: PeopleEvent) {
+        when (event) {
+            is PeopleEvent.FilterData -> searchByFilter(event.text)
+            is PeopleEvent.NavigateToUser -> navigate(event.userId)
+        }
     }
 
     private fun getAllUsers() {
@@ -31,7 +37,7 @@ class PeopleViewModel @AssistedInject constructor(
         }
     }
 
-    fun searchByFilter(searchText: String) {
+    private fun searchByFilter(searchText: String) {
         //ToDo fix
         when (val state = _state.value) {
             is PeopleState.Content -> {
@@ -44,8 +50,7 @@ class PeopleViewModel @AssistedInject constructor(
         }
     }
 
-    fun navigate(userId: Long) {
-        println("Navigator clicked")
+    private fun navigate(userId: Long) {
         viewModelScope.launch {
             navigator.navigate(NavState.ProfileNav(userId))
         }

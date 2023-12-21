@@ -4,7 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,10 +17,15 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,13 +54,12 @@ fun PeopleScreenHolder() {
 
     PeopleScreen(
         state = state,
-        onSearch = viewModel::searchByFilter,
-        onNavigate = viewModel::navigate
+        onEvent = viewModel::obtainEvent
     )
 }
 
 @Composable
-fun PeopleScreen(state: PeopleState, onSearch: (String) -> Unit, onNavigate: (Long) -> Unit) {
+private fun PeopleScreen(state: PeopleState, onEvent: (PeopleEvent) -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -62,26 +70,28 @@ fun PeopleScreen(state: PeopleState, onSearch: (String) -> Unit, onNavigate: (Lo
             is PeopleState.Loading -> Preloader()
             is PeopleState.Content -> MainState(
                 state = state,
-                onSearch = onSearch,
-                onNavigate = onNavigate
+                onEvent = onEvent
             )
         }
     }
 }
 
 @Composable
-fun MainState(state: PeopleState.Content, onSearch: (String) -> Unit, onNavigate: (Long) -> Unit) {
+private fun MainState(state: PeopleState.Content, onEvent: (PeopleEvent) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        SearchBar(placeHolderString = "Users...", onClick = onSearch)
-        UsersList(state::visibleItems, onNavigate)
+        SearchBar(
+            placeHolderString = "Users...",
+            onClick = { onEvent.invoke(PeopleEvent.FilterData(it)) }
+        )
+        UsersList(state::visibleItems, onEvent)
     }
 }
 
 @Composable
-fun UsersList(data: () -> List<UserModel>, onNavigate: (Long) -> Unit) {
+private fun UsersList(data: () -> List<UserModel>, onEvent: (PeopleEvent) -> Unit) {
     LazyColumn {
         items(data.invoke()) { item ->
             UserListItem(
@@ -89,7 +99,7 @@ fun UsersList(data: () -> List<UserModel>, onNavigate: (Long) -> Unit) {
                 name = item.name,
                 email = item.email ?: "No email",
                 avatarUrls = item.avatarUrl,
-                onNavigate = onNavigate
+                onEvent = onEvent
             )
         }
     }
@@ -97,12 +107,12 @@ fun UsersList(data: () -> List<UserModel>, onNavigate: (Long) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserListItem(
+private fun UserListItem(
     userId: Long,
     name: String,
     email: String,
     avatarUrls: String?,
-    onNavigate: (Long) -> Unit
+    onEvent: (PeopleEvent) -> Unit
 ) {
     ListItem(
         headlineText = { Text(text = name) },
@@ -122,7 +132,7 @@ fun UserListItem(
                         .clip(RoundedCornerShape(percent = 50))
                 )
         },
-        modifier = Modifier.clickable { onNavigate.invoke(userId) }
+        modifier = Modifier.clickable { onEvent.invoke(PeopleEvent.NavigateToUser(userId)) }
     )
     Divider(color = Color.Gray, thickness = 1.dp)
 }
@@ -133,8 +143,7 @@ private fun ScreenLoadingPreview() {
     AndroidzulipchatappTheme {
         PeopleScreen(
             state = PeopleState.Loading,
-            onSearch = {},
-            onNavigate = {}
+            onEvent = {}
         )
     }
 }
@@ -153,8 +162,7 @@ private fun ScreenContentPreview() {
         }
         PeopleScreen(
             state = PeopleState.Content(items, items),
-            onSearch = {},
-            onNavigate = {}
+            onEvent = {}
         )
     }
 }

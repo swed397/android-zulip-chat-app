@@ -31,8 +31,6 @@ import coil.compose.SubcomposeAsyncImage
 import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.di.injectedViewModel
-import com.android.zulip.chat.app.domain.CurrentUserModel
-import com.android.zulip.chat.app.domain.ZulipUserStatus
 import com.android.zulip.chat.app.ui.Preloader
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
 
@@ -47,11 +45,10 @@ fun ProfileScreenHolder(userId: Long?) {
     val state by viewModel.state.collectAsState()
 
     ProfileScreen(state = state)
-
 }
 
 @Composable
-fun ProfileScreen(state: ProfileState) {
+private fun ProfileScreen(state: ProfileState) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -66,7 +63,7 @@ fun ProfileScreen(state: ProfileState) {
 }
 
 @Composable
-fun MainState(user: CurrentUserModel) {
+private fun MainState(user: ProfileUiModel) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -105,17 +102,9 @@ fun MainState(user: CurrentUserModel) {
                     .width(10.dp)
             )
             Text(
-                text = when (user.status) {
-                    ZulipUserStatus.ACTIVE -> "Online"
-                    ZulipUserStatus.IDLE -> "Idle"
-                    ZulipUserStatus.OFFLINE -> "Offline"
-                },
+                text = user.statusText,
                 textAlign = TextAlign.Center,
-                color = when (user.status) {
-                    ZulipUserStatus.ACTIVE -> Color.Green
-                    ZulipUserStatus.IDLE -> Color.Yellow
-                    ZulipUserStatus.OFFLINE -> Color.Red
-                },
+                color = user.color,
                 fontSize = 30.sp,
             )
         }
@@ -124,15 +113,16 @@ fun MainState(user: CurrentUserModel) {
 
 @Composable
 @Preview
-fun PreviewProfileScreen() {
+private fun PreviewProfileScreen() {
     AndroidzulipchatappTheme {
         ProfileScreen(
             state = ProfileState.Content(
-                CurrentUserModel(
+                ProfileUiModel(
                     id = 1L,
                     name = "Test Name",
                     avatarUrl = null,
-                    status = ZulipUserStatus.ACTIVE
+                    statusText = "Online",
+                    color = Color.Green
                 )
             )
         )

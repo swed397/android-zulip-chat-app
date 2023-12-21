@@ -4,5 +4,5 @@ data class UserModel(
     val id: Long,
     val name: String,
     val email: String?,
-    val avatarUrl: String?
+    val avatarUrl: String?,
 )

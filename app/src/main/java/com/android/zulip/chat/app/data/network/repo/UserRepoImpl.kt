@@ -8,8 +8,6 @@ import javax.inject.Inject
 
 class UserRepoImpl @Inject constructor(private val zulipApi: ZulipApi) : UserRepo {
 
-
-    //ToDo Create Mapper
     override suspend fun getAllUsers(): List<UserModel> =
         zulipApi.getAllUsers().members.map {
             UserModel(
@@ -20,7 +18,6 @@ class UserRepoImpl @Inject constructor(private val zulipApi: ZulipApi) : UserRep
             )
         }
 
-    //ToDo Refactoring
     override suspend fun getUserById(userId: Long): CurrentUserModel =
         zulipApi.getUserById(userId).user.let {
             CurrentUserModel(

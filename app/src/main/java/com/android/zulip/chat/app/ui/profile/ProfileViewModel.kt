@@ -1,7 +1,9 @@
 package com.android.zulip.chat.app.ui.profile
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.zulip.chat.app.OWN_USER_ID
 import com.android.zulip.chat.app.domain.UserRepo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -12,6 +14,7 @@ import kotlinx.coroutines.launch
 
 class ProfileViewModel @AssistedInject constructor(
     private val userRepo: UserRepo,
+    private val profileUiMapper: ProfileUiMapper,
     @Assisted userId: Long
 ) : ViewModel() {
 
@@ -20,13 +23,16 @@ class ProfileViewModel @AssistedInject constructor(
 
 
     init {
+        Log.d("BACKSTACK", userId.toString())
         getUserById(userId)
     }
 
     private fun getUserById(userId: Long) {
         viewModelScope.launch {
+
+            Log.d("USER INFO", userId.toString())
             val user = userRepo.getUserById(userId)
-            _state.emit(ProfileState.Content(user))
+            _state.emit(ProfileState.Content(profileUiMapper(user)))
         }
     }
 

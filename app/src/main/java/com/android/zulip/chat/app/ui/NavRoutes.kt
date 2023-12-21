@@ -1,13 +1,15 @@
-package com.android.zulip.chat.app.domain
+package com.android.zulip.chat.app.ui
 
 enum class NavRoutes(val label: String) {
     CHANNELS("ChannelsScreen"),
     PEOPLES("PeoplesScreen"),
-    PROFILE("ProfileScreen")
+    PROFILE("ProfileScreen"),
+    OWN_PROFILE("OwnProfileScreen")
 }
 
 sealed interface NavState {
     object ChannelsNav : NavState
     data class ProfileNav(val id: Long) : NavState
     object PeoplesNav : NavState
+    object OwnProfileNav : NavState
 }
