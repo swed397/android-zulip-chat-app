@@ -1,7 +1,6 @@
 package com.android.zulip.chat.app.data.network.repo
 
 import com.android.zulip.chat.app.data.network.ZulipApi
-import com.android.zulip.chat.app.data.network.model.Stream
 import com.android.zulip.chat.app.data.network.model.StreamInfo
 import com.android.zulip.chat.app.data.network.model.TopicInfo
 import com.android.zulip.chat.app.domain.ChannelsRepo
