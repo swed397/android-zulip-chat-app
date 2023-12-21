@@ -3,7 +3,6 @@ package com.android.zulip.chat.app.ui.profile
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.zulip.chat.app.OWN_USER_ID
 import com.android.zulip.chat.app.domain.UserRepo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
