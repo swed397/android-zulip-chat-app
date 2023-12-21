@@ -20,7 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.android.zulip.chat.app.OWN_USER_ID
 import com.android.zulip.chat.app.R
-import com.android.zulip.chat.app.ui.chanels.ChannelsScreen
+import com.android.zulip.chat.app.ui.chanels.ChannelsScreenHolder
 import com.android.zulip.chat.app.ui.people.PeopleScreenHolder
 import com.android.zulip.chat.app.ui.profile.ProfileScreenHolder
 
@@ -36,7 +36,7 @@ fun MainScreen(navController: NavHostController) {
             modifier = Modifier.weight(1f)
         ) {
             composable(NavRoutes.CHANNELS.label) {
-                ChannelsScreen()
+                ChannelsScreenHolder()
                 selectedItem.value = NavRoutes.CHANNELS
                 navBarVisible.value = true
             }
