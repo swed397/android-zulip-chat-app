@@ -1,6 +1,7 @@
 package com.android.zulip.chat.app.ui.chanels
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.R
+import com.android.zulip.chat.app.data.network.model.StreamInfo
 import com.android.zulip.chat.app.di.injectedViewModel
 import com.android.zulip.chat.app.ui.Preloader
 import com.android.zulip.chat.app.ui.SearchBar
@@ -74,9 +76,6 @@ private fun ChannelsScreen(state: ChannelsState, onEvent: (ChannelsEvent) -> Uni
 
 @Composable
 private fun ChanelTabs(state: ChannelsState.Content, onEvent: (ChannelsEvent) -> Unit) {
-    var tabIndex by remember { mutableStateOf(0) }
-
-    val tabs = listOf("Subscribed", "All")
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -85,75 +84,91 @@ private fun ChanelTabs(state: ChannelsState.Content, onEvent: (ChannelsEvent) ->
         SearchBar(placeHolderString = "Search...", onClick = {})
 
         Column(modifier = Modifier.fillMaxWidth()) {
-            TabRow(selectedTabIndex = tabIndex) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(text = { Text(title) },
-                        selected = tabIndex == index,
-                        onClick = { tabIndex = index }
-                    )
+            TabRow(
+                selectedTabIndex = when (state.streamType) {
+                    StreamType.ALL -> 0
+                    StreamType.SUBSCRIBED -> 1
                 }
+            ) {
+                Tab(text = { Text("All") },
+                    selected = state.streamType == StreamType.ALL,
+                    onClick = {
+                        onEvent.invoke(ChannelsEvent.LoadStreams(StreamType.ALL))
+                    }
+                )
+                Tab(text = { Text("Subscribed") },
+                    selected = state.streamType == StreamType.SUBSCRIBED,
+                    onClick = {
+                        onEvent.invoke(ChannelsEvent.LoadStreams(StreamType.SUBSCRIBED))
+                    }
+                )
             }
 
-            //ToDo refactor
-            when (tabIndex) {
-                0 -> {
-                    onEvent.invoke(ChannelsEvent.AllStreams)
-                    StreamsList(state)
-                }
-
-                1 -> {
-                    onEvent.invoke(ChannelsEvent.SubscribedStreams)
-                    StreamsList(state)
-                }
-            }
+            StreamsList(state = state, onEvent = onEvent)
         }
     }
 }
 
 @Composable
-private fun StreamsList(onEvent: ChannelsState.Content) {
+private fun StreamsList(state: ChannelsState.Content, onEvent: (ChannelsEvent) -> Unit) {
     LazyColumn {
-        items(onEvent.data) {
-            StreamListItem(it.name)
+        items(items = state.data, key = { it.id }) {
+            StreamListItem(it, onEvent)
             Divider(color = Color.Gray, thickness = 1.dp)
         }
     }
 }
 
 @Composable
-private fun StreamListItem(text: String) {
+private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Unit) {
     var expanded by remember { mutableStateOf(true) }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .background(color = Color.Black)
-            .animateContentSize()
-            .height(if (expanded) 60.dp else 120.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) {
-                expanded = !expanded
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .background(color = Color.Black)
+                .animateContentSize()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+//                    expanded = !expanded
+                    Log.d("CLICK", "CLICKED")
+                    onEvent.invoke(ChannelsEvent.OpenStream(stream.id))
+                }
+        ) {
+            Text(
+                text = stream.name,
+                fontSize = 18.sp,
+                color = Color.Green,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(9f)
+                    .wrapContentHeight()
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_keyboard_arrow_down_24),
+                contentDescription = null,
+                tint = Color.Green,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+            )
+        }
+
+        if (stream.isOpened) {
+            stream.topicsList.forEach {
+                Text(
+                    text = it.name,
+                    fontSize = 18.sp,
+                    color = Color.Cyan,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Yellow)
+                )
             }
-    ) {
-        Text(
-            text = text,
-            fontSize = 18.sp,
-            color = Color.Green,
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(9f)
-                .wrapContentHeight()
-        )
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_keyboard_arrow_down_24),
-            contentDescription = null,
-            tint = Color.Green,
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
-        )
+        }
     }
 }
 
