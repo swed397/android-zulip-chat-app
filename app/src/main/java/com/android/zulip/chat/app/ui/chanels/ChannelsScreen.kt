@@ -2,7 +2,14 @@ package com.android.zulip.chat.app.ui.chanels
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,7 +35,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -119,7 +128,7 @@ private fun StreamsList(state: ChannelsState.Content, onEvent: (ChannelsEvent) -
 
 @Composable
 private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Unit) {
-    var expanded by remember { mutableStateOf(true) }
+    var rotation by remember { mutableStateOf(true) }
 
     Column {
         Row(
@@ -131,7 +140,7 @@ private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Un
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
-//                    expanded = !expanded
+                    rotation = !rotation
                     Log.d("CLICK", "CLICKED")
                     onEvent.invoke(ChannelsEvent.OpenStream(stream.id))
                 }
@@ -150,11 +159,15 @@ private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Un
                 contentDescription = null,
                 tint = Color.Green,
                 modifier = Modifier
+                    .graphicsLayer {
+                        this.rotationZ = if (rotation) 0f else 180f
+                    }
                     .fillMaxSize()
                     .weight(1f)
             )
         }
 
+//        AnimatedVisibility(visible = stream.isOpened) {
         if (stream.isOpened) {
             stream.topicsList.forEach {
                 Text(
