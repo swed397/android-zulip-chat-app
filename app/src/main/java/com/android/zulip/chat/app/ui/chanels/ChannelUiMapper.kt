@@ -9,7 +9,8 @@ class ChannelUiMapper @Inject constructor() {
         StreamUiModel(
             id = it.id,
             name = it.name,
-            topicsList = it.topicsList
+            topicsList = it.topicsList,
+            isOpened = false
         )
     }
 }

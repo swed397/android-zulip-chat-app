@@ -1,14 +1,15 @@
 package com.android.zulip.chat.app.ui.chanels
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -20,6 +21,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,15 +29,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.R
+import com.android.zulip.chat.app.data.network.model.TopicInfo
 import com.android.zulip.chat.app.di.injectedViewModel
 import com.android.zulip.chat.app.ui.Preloader
 import com.android.zulip.chat.app.ui.SearchBar
@@ -80,7 +85,9 @@ private fun ChanelTabs(state: ChannelsState.Content, onEvent: (ChannelsEvent) ->
             .fillMaxSize()
             .background(Color.Blue),
     ) {
-        SearchBar(placeHolderString = "Search...", onClick = {})
+        SearchBar(
+            placeHolderString = "Search...",
+            onClick = { onEvent.invoke(ChannelsEvent.FilterData(it)) })
 
         Column(modifier = Modifier.fillMaxWidth()) {
             TabRow(
@@ -111,7 +118,7 @@ private fun ChanelTabs(state: ChannelsState.Content, onEvent: (ChannelsEvent) ->
 @Composable
 private fun StreamsList(state: ChannelsState.Content, onEvent: (ChannelsEvent) -> Unit) {
     LazyColumn {
-        items(items = state.data, key = { it.id }) {
+        items(items = state.visibleData, key = { it.id }) {
             StreamListItem(it, onEvent)
             Divider(color = Color.Gray, thickness = 1.dp)
         }
@@ -120,9 +127,9 @@ private fun StreamsList(state: ChannelsState.Content, onEvent: (ChannelsEvent) -
 
 @Composable
 private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Unit) {
-    var rotation by remember { mutableStateOf(true) }
-
-    Column {
+    Column(
+        modifier = Modifier.animateContentSize()
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -132,8 +139,6 @@ private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Un
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
-                    rotation = !rotation
-                    Log.d("CLICK", "CLICKED")
                     onEvent.invoke(ChannelsEvent.OpenStream(stream.id))
                 }
         ) {
@@ -146,20 +151,9 @@ private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Un
                     .weight(9f)
                     .wrapContentHeight()
             )
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_keyboard_arrow_down_24),
-                contentDescription = null,
-                tint = Color.Green,
-                modifier = Modifier
-                    .graphicsLayer {
-                        this.rotationZ = if (rotation) 0f else 180f
-                    }
-                    .fillMaxSize()
-                    .weight(1f)
-            )
+            ArrowIcon(isExpanded = stream.isOpened)
         }
 
-//        AnimatedVisibility(visible = stream.isOpened) {
         if (stream.isOpened) {
             stream.topicsList.forEach {
                 Text(
@@ -176,14 +170,81 @@ private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Un
 }
 
 @Composable
+private fun RowScope.ArrowIcon(isExpanded: Boolean) {
+
+    var rotation by remember { mutableStateOf(0f) }
+
+    val animateValue by animateFloatAsState(targetValue = rotation, label = "rotation")
+
+    LaunchedEffect(isExpanded) {
+        rotation = if (isExpanded) {
+            0f
+        } else {
+            180f
+        }
+    }
+
+    Icon(
+        modifier = Modifier
+            .fillMaxSize()
+            .weight(1f)
+            .rotate(animateValue),
+        painter = painterResource(id = R.drawable.baseline_keyboard_arrow_up_24),
+        contentDescription = null,
+        tint = Color.Green,
+    )
+}
+
+@Composable
 @Preview
-fun ChannelPreview() {
+fun ChannelPreview(
+    @PreviewParameter(PreviewStateProvider::class) state: ChannelsState
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Blue),
     ) {
-//        SearchBar("Search...")
-//        ChanelTabs()
+        ChannelsScreen(
+            state = state,
+            onEvent = {}
+        )
+    }
+}
+
+class PreviewStateProvider : PreviewParameterProvider<ChannelsState> {
+
+    override val values: Sequence<ChannelsState>
+        get() = sequenceOf(
+            ChannelsState.Loading,
+            content
+        )
+
+    companion object {
+        val topics = listOf(
+            TopicInfo(0, "Topic_0"),
+            TopicInfo(1, "Topic_1"),
+        )
+
+        val items = listOf(
+            StreamUiModel(
+                id = 0,
+                name = "Stream_0",
+                isOpened = false,
+                topicsList = topics
+            ),
+            StreamUiModel(
+                id = 1,
+                name = "Stream_1",
+                isOpened = false,
+                topicsList = topics
+            )
+        )
+
+        val content = ChannelsState.Content(
+            allData = items,
+            visibleData = items,
+            streamType = StreamType.SUBSCRIBED
+        )
     }
 }

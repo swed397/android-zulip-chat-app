@@ -1,6 +1,7 @@
 package com.android.zulip.chat.app.ui.chanels
 
-interface ChannelsEvent {
+sealed interface ChannelsEvent {
     data class LoadStreams(val streamType: StreamType) : ChannelsEvent
     data class OpenStream(val id: Long) : ChannelsEvent
+    data class FilterData(val searchText: String) : ChannelsEvent
 }
