@@ -1,6 +1,5 @@
 package com.android.zulip.chat.app.ui.chanels
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
