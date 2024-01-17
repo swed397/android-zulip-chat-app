@@ -1,8 +1,8 @@
 package com.android.zulip.chat.app
 
 import android.app.Application
-import com.android.zulip.chat.app.di.AppComponent
-import com.android.zulip.chat.app.di.DaggerAppComponent
+import com.android.zulip.chat.app.di.components.AppComponent
+import com.android.zulip.chat.app.di.components.DaggerAppComponent
 
 class App : Application() {
 

@@ -1,4 +1,4 @@
-package com.android.zulip.chat.app.domain
+package com.android.zulip.chat.app.domain.interactor
 
 import com.android.zulip.chat.app.data.network.model.StreamInfo
 

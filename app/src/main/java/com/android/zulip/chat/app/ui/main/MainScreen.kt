@@ -1,4 +1,4 @@
-package com.android.zulip.chat.app.ui
+package com.android.zulip.chat.app.ui.main
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

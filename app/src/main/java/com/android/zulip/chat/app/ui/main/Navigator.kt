@@ -1,4 +1,4 @@
-package com.android.zulip.chat.app.ui
+package com.android.zulip.chat.app.ui.main
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +11,6 @@ class Navigator @Inject constructor() {
 
     //ToDo fix
     suspend fun navigate(nav: NavState) {
-        println("NAV VALUE = $nav")
         _navigateFlow.emit(nav)
     }
 }

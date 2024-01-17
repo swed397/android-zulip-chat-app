@@ -1,10 +1,8 @@
-package com.android.zulip.chat.app.di
+package com.android.zulip.chat.app.di.modules
 
 import com.android.zulip.chat.app.data.network.ZulipApi
-import com.android.zulip.chat.app.data.network.repo.ChannelsRepoImpl
 import com.android.zulip.chat.app.data.network.repo.UserRepoImpl
-import com.android.zulip.chat.app.domain.ChannelsRepo
-import com.android.zulip.chat.app.domain.UserRepo
+import com.android.zulip.chat.app.domain.interactor.UserRepo
 import dagger.Module
 import dagger.Provides
 import okhttp3.Credentials
@@ -63,11 +61,11 @@ class NetworkModule {
         }
     }
 
-    @Provides
-    @Singleton
-    fun providesUserRepo(zulipApi: ZulipApi): UserRepo = UserRepoImpl(zulipApi)
+//    @Provides
+//    @Singleton
+//    fun providesUserRepo(zulipApi: ZulipApi): UserRepo = UserRepoImpl(zulipApi)
 
-    @Provides
-    @Singleton
-    fun providesChannelsRepo(zulipApi: ZulipApi): ChannelsRepo = ChannelsRepoImpl(zulipApi)
+//    @Provides
+//    @Singleton
+//    fun providesChannelsRepo(zulipApi: ZulipApi): ChannelsRepo = ChannelsRepoImpl(zulipApi)
 }

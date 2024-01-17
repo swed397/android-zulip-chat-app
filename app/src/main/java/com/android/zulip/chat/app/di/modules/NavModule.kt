@@ -1,6 +1,6 @@
-package com.android.zulip.chat.app.di
+package com.android.zulip.chat.app.di.modules
 
-import com.android.zulip.chat.app.ui.Navigator
+import com.android.zulip.chat.app.ui.main.Navigator
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

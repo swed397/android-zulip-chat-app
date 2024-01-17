@@ -1,6 +1,6 @@
 package com.android.zulip.chat.app.ui.people
 
-import com.android.zulip.chat.app.domain.UserModel
+import com.android.zulip.chat.app.domain.model.UserModel
 
 sealed interface PeopleState {
     object Loading : PeopleState

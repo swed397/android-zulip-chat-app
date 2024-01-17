@@ -39,7 +39,8 @@ import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
 fun ProfileScreenHolder(userId: Long?) {
     val context = LocalContext.current.applicationContext
     val viewModel = injectedViewModel {
-        (context as App).appComponent.profileViewModelFactory.create(userId!!)
+        (context as App).appComponent.userComponent()
+            .build().profileViewModelFactory.create(userId!!)
     }
 
     val state by viewModel.state.collectAsState()

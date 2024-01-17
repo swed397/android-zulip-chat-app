@@ -1,9 +1,9 @@
 package com.android.zulip.chat.app.data.network.repo
 
 import com.android.zulip.chat.app.data.network.ZulipApi
-import com.android.zulip.chat.app.domain.CurrentUserModel
-import com.android.zulip.chat.app.domain.UserModel
-import com.android.zulip.chat.app.domain.UserRepo
+import com.android.zulip.chat.app.domain.model.CurrentUserModel
+import com.android.zulip.chat.app.domain.model.UserModel
+import com.android.zulip.chat.app.domain.interactor.UserRepo
 import javax.inject.Inject
 
 class UserRepoImpl @Inject constructor(private val zulipApi: ZulipApi) : UserRepo {

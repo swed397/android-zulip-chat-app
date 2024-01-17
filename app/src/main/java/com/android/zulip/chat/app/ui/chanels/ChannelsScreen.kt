@@ -50,14 +50,13 @@ fun ChannelsScreenHolder() {
 
     val context = LocalContext.current.applicationContext
     val viewModel = injectedViewModel {
-        (context as App).appComponent.channelViewModelFactory.create()
+        (context as App).appComponent.channelsComponent().build().channelsViewModelFactory.create()
     }
 
     val state by viewModel.state.collectAsState()
     ChannelsScreen(state = state, onEvent = viewModel::obtainEvent)
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 private fun ChannelsScreen(state: ChannelsState, onEvent: (ChannelsEvent) -> Unit) {
     Box(

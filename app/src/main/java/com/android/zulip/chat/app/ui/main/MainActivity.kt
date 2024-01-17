@@ -1,4 +1,4 @@
-package com.android.zulip.chat.app
+package com.android.zulip.chat.app.ui.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,10 +8,7 @@ import androidx.compose.material3.Surface
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.android.zulip.chat.app.ui.MainScreen
-import com.android.zulip.chat.app.ui.NavRoutes
-import com.android.zulip.chat.app.ui.NavState
-import com.android.zulip.chat.app.ui.Navigator
+import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
 import kotlinx.coroutines.launch
 import javax.inject.Inject

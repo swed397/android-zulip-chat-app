@@ -1,4 +1,4 @@
-package com.android.zulip.chat.app.ui
+package com.android.zulip.chat.app.ui.main
 
 enum class NavRoutes(val label: String) {
     CHANNELS("ChannelsScreen"),

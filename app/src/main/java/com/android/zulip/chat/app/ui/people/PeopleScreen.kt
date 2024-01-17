@@ -29,7 +29,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.di.injectedViewModel
-import com.android.zulip.chat.app.domain.UserModel
+import com.android.zulip.chat.app.domain.model.UserModel
 import com.android.zulip.chat.app.ui.Preloader
 import com.android.zulip.chat.app.ui.SearchBar
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
@@ -38,7 +38,7 @@ import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
 fun PeopleScreenHolder() {
     val context = LocalContext.current.applicationContext
     val viewModel = injectedViewModel {
-        (context as App).appComponent.peopleViewModelFactory.create()
+        (context as App).appComponent.userComponent().build().peopleViewModelFactory.create()
     }
 
     val state by viewModel.state.collectAsState()

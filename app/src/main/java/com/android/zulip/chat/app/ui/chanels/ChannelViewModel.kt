@@ -2,7 +2,7 @@ package com.android.zulip.chat.app.ui.chanels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.zulip.chat.app.domain.ChannelsRepo
+import com.android.zulip.chat.app.domain.interactor.ChannelsRepo
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +19,7 @@ class ChannelViewModel @AssistedInject constructor(
     val state: StateFlow<ChannelsState> = _state
 
     init {
+        println(this)
         getAllStreams()
     }
 

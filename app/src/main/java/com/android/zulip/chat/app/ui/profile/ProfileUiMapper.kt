@@ -1,7 +1,7 @@
 package com.android.zulip.chat.app.ui.profile
 
 import androidx.compose.ui.graphics.Color
-import com.android.zulip.chat.app.domain.CurrentUserModel
+import com.android.zulip.chat.app.domain.model.CurrentUserModel
 import com.android.zulip.chat.app.domain.ZulipUserStatus
 import javax.inject.Inject
 
