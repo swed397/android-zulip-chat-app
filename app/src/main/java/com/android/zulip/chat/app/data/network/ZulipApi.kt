@@ -7,13 +7,9 @@ import com.android.zulip.chat.app.data.network.model.Streams
 import com.android.zulip.chat.app.data.network.model.SubscribedStreams
 import com.android.zulip.chat.app.data.network.model.Topics
 import com.android.zulip.chat.app.data.network.model.User
-import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
-import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
-import retrofit2.http.QueryMap
-import retrofit2.http.QueryName
 
 
 interface ZulipApi {

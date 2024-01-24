@@ -1,7 +1,6 @@
 package com.android.zulip.chat.app.data.network.model
 
 import com.google.gson.annotations.SerializedName
-import java.time.LocalDateTime
 
 data class MessagesResponse(
 
