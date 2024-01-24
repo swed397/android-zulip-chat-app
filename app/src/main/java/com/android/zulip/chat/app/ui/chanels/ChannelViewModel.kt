@@ -2,7 +2,9 @@ package com.android.zulip.chat.app.ui.chanels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.zulip.chat.app.domain.interactor.ChannelsRepo
+import com.android.zulip.chat.app.domain.repo.ChannelsRepo
+import com.android.zulip.chat.app.ui.main.NavState
+import com.android.zulip.chat.app.ui.main.Navigator
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,14 +14,14 @@ import kotlinx.coroutines.launch
 
 class ChannelViewModel @AssistedInject constructor(
     private val channelsRepo: ChannelsRepo,
-    private val channelMapper: ChannelUiMapper
+    private val channelMapper: ChannelUiMapper,
+    private val navigator: Navigator
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<ChannelsState>(ChannelsState.Loading)
     val state: StateFlow<ChannelsState> = _state
 
     init {
-        println(this)
         getAllStreams()
     }
 
@@ -35,6 +37,16 @@ class ChannelViewModel @AssistedInject constructor(
 
             is ChannelsEvent.OpenStream -> openStreamAction(event.id)
             is ChannelsEvent.FilterData -> searchByFilter(event.searchText)
+            is ChannelsEvent.NavigateToChat -> openChatByStreamNameAndTopicName(
+                streamName = event.streamName,
+                topicName = event.topicName
+            )
+        }
+    }
+
+    private fun openChatByStreamNameAndTopicName(streamName: String, topicName: String) {
+        viewModelScope.launch {
+            navigator.navigate(NavState.ChatNav(streamName = streamName, topicName = topicName))
         }
     }
 

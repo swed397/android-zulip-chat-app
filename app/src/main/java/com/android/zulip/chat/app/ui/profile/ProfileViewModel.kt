@@ -3,7 +3,7 @@ package com.android.zulip.chat.app.ui.profile
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.zulip.chat.app.domain.interactor.UserRepo
+import com.android.zulip.chat.app.domain.repo.UserRepo
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -22,7 +22,6 @@ class ProfileViewModel @AssistedInject constructor(
 
 
     init {
-        Log.d("BACKSTACK", userId.toString())
         getUserById(userId)
     }
 

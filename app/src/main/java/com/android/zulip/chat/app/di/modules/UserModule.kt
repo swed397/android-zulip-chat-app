@@ -3,7 +3,7 @@ package com.android.zulip.chat.app.di.modules
 import com.android.zulip.chat.app.data.network.ZulipApi
 import com.android.zulip.chat.app.data.network.repo.UserRepoImpl
 import com.android.zulip.chat.app.di.scopes.UserScope
-import com.android.zulip.chat.app.domain.interactor.UserRepo
+import com.android.zulip.chat.app.domain.repo.UserRepo
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

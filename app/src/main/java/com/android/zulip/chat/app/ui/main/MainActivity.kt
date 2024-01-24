@@ -5,10 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.android.zulip.chat.app.App
+import com.android.zulip.chat.app.di.injectedViewModel
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,14 +29,7 @@ class MainActivity : ComponentActivity() {
         (applicationContext as App).appComponent.inject(this)
 
         setContent {
-            AndroidzulipchatappTheme {
-                Surface(
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    navController = rememberNavController()
-                    MainScreen(navController)
-                }
-            }
+            MainHolder()
         }
 
         lifecycleScope.launch {
@@ -47,6 +43,26 @@ class MainActivity : ComponentActivity() {
             is NavState.PeoplesNav -> println("TRY NAV PEOPLES")
             is NavState.ProfileNav -> navController.navigate("${NavRoutes.PROFILE.label}?userId=${navState.id}")
             is NavState.OwnProfileNav -> navController.navigate(NavRoutes.OWN_PROFILE.label)
+            is NavState.ChatNav -> navController.navigate("${NavRoutes.CHAT.label}?streamName=${navState.streamName}&&topicName=${navState.topicName}")
+        }
+    }
+
+    @Composable
+    private fun MainHolder() {
+        val context = LocalContext.current.applicationContext
+        injectedViewModel { (context as App).appComponent.mainActivityViewModelFactory.create() }
+        Main()
+    }
+
+    @Composable
+    private fun Main() {
+        AndroidzulipchatappTheme {
+            Surface(
+                color = MaterialTheme.colorScheme.background
+            ) {
+                navController = rememberNavController()
+                MainScreen(navController)
+            }
         }
     }
 }

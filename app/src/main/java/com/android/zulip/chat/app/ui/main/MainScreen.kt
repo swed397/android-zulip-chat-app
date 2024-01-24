@@ -21,6 +21,7 @@ import androidx.navigation.navArgument
 import com.android.zulip.chat.app.OWN_USER_ID
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.ui.chanels.ChannelsScreenHolder
+import com.android.zulip.chat.app.ui.chat.ChatScreenHolder
 import com.android.zulip.chat.app.ui.people.PeopleScreenHolder
 import com.android.zulip.chat.app.ui.profile.ProfileScreenHolder
 
@@ -61,6 +62,24 @@ fun MainScreen(navController: NavHostController) {
                 ProfileScreenHolder(OWN_USER_ID)
                 selectedItem.value = NavRoutes.PROFILE
                 navBarVisible.value = true
+            }
+            composable(
+                "${NavRoutes.CHAT.label}?streamName={streamName}&&topicName={topicName}",
+                arguments = listOf(
+                    navArgument("streamName") {
+                        defaultValue = ""
+                    },
+                    navArgument("topicName") {
+                        defaultValue = ""
+                    }
+                )
+            ) { backStackEntry ->
+                ChatScreenHolder(
+                    streamName = backStackEntry.arguments!!.getString("streamName")!!,
+                    topicName = backStackEntry.arguments!!.getString("topicName")!!
+                )
+                selectedItem.value = NavRoutes.CHAT
+                navBarVisible.value = false
             }
         }
 

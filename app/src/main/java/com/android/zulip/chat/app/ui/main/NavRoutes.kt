@@ -4,7 +4,8 @@ enum class NavRoutes(val label: String) {
     CHANNELS("ChannelsScreen"),
     PEOPLES("PeoplesScreen"),
     PROFILE("ProfileScreen"),
-    OWN_PROFILE("OwnProfileScreen")
+    OWN_PROFILE("OwnProfileScreen"),
+    CHAT("ChatScreen")
 }
 
 sealed interface NavState {
@@ -12,4 +13,5 @@ sealed interface NavState {
     data class ProfileNav(val id: Long) : NavState
     object PeoplesNav : NavState
     object OwnProfileNav : NavState
+    data class ChatNav(val streamName: String, val topicName: String) : NavState
 }

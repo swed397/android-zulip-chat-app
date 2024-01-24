@@ -161,6 +161,14 @@ private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Un
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color.Yellow)
+                        .clickable {
+                            onEvent.invoke(
+                                ChannelsEvent.NavigateToChat(
+                                    streamName = stream.name,
+                                    topicName = it.name
+                                )
+                            )
+                        }
                 )
             }
         }

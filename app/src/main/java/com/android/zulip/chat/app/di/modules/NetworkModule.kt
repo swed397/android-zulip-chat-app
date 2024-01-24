@@ -58,12 +58,4 @@ class NetworkModule {
             setLevel(HttpLoggingInterceptor.Level.BODY)
         }
     }
-
-//    @Provides
-//    @Singleton
-//    fun providesUserRepo(zulipApi: ZulipApi): UserRepo = UserRepoImpl(zulipApi)
-
-//    @Provides
-//    @Singleton
-//    fun providesChannelsRepo(zulipApi: ZulipApi): ChannelsRepo = ChannelsRepoImpl(zulipApi)
 }

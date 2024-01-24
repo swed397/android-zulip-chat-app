@@ -3,7 +3,7 @@ package com.android.zulip.chat.app.data.network.repo
 import com.android.zulip.chat.app.data.network.ZulipApi
 import com.android.zulip.chat.app.data.network.model.StreamInfo
 import com.android.zulip.chat.app.data.network.model.TopicInfo
-import com.android.zulip.chat.app.domain.interactor.ChannelsRepo
+import com.android.zulip.chat.app.domain.repo.ChannelsRepo
 import javax.inject.Inject
 
 class ChannelsRepoImpl @Inject constructor(private val zulipApi: ZulipApi) : ChannelsRepo {
