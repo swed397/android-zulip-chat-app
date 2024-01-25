@@ -1,6 +1,5 @@
 package com.android.zulip.chat.app.data.network.repo
 
-import com.android.zulip.chat.app.data.network.ApiEventHandler
 import com.android.zulip.chat.app.data.network.ZulipApi
 import com.android.zulip.chat.app.data.network.model.Narrow
 import com.android.zulip.chat.app.data.network.model.NarrowType
