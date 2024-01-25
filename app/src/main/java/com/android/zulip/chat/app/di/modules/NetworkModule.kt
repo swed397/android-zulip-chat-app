@@ -1,5 +1,6 @@
 package com.android.zulip.chat.app.di.modules
 
+import com.android.zulip.chat.app.data.network.ApiEventHandler
 import com.android.zulip.chat.app.data.network.ZulipApi
 import dagger.Module
 import dagger.Provides
@@ -58,4 +59,8 @@ class NetworkModule {
             setLevel(HttpLoggingInterceptor.Level.BODY)
         }
     }
+
+    @Provides
+    @Singleton
+    fun provideEventHandle(zulipApi: ZulipApi): ApiEventHandler = ApiEventHandler(zulipApi)
 }

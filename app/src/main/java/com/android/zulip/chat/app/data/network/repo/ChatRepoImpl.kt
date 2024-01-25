@@ -1,5 +1,6 @@
 package com.android.zulip.chat.app.data.network.repo
 
+import com.android.zulip.chat.app.data.network.ApiEventHandler
 import com.android.zulip.chat.app.data.network.ZulipApi
 import com.android.zulip.chat.app.data.network.model.Narrow
 import com.android.zulip.chat.app.data.network.model.NarrowType
@@ -27,5 +28,5 @@ class ChatRepoImpl @Inject constructor(private val zulipApi: ZulipApi) : ChatRep
                 )
             )
         )
-    ).messages.map { it.toDto() }
+    ).messages.map { it.toDto() }.reversed()
 }

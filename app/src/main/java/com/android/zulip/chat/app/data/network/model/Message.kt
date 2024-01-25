@@ -5,10 +5,10 @@ import com.google.gson.annotations.SerializedName
 data class MessagesResponse(
 
     @SerializedName("messages")
-    val messages: List<Messages>
+    val messages: List<Message>
 )
 
-data class Messages(
+data class Message(
 
     @SerializedName("id")
     val id: Long,
