@@ -12,6 +12,7 @@ import javax.inject.Inject
 
 class ApiEventHandler @Inject constructor(private val zulipApi: ZulipApi) {
 
+    //ToDo Временно (тесты)
     private val _event =
         MutableSharedFlow<List<MessageModel>>(onBufferOverflow = BufferOverflow.SUSPEND)
     val event: SharedFlow<List<MessageModel>> = _event
