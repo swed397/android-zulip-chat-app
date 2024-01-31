@@ -145,7 +145,7 @@ private fun MessageContentItem(message: MessageModel) {
 
     ) {
         SenderNameItem(senderName = message.userFullName)
-        MessageContent(messageContent = message.messageContent ?: "")
+        MessageContent(messageContent = message.messageContent)
     }
 }
 
