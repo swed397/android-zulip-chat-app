@@ -3,8 +3,8 @@ package com.android.zulip.chat.app.ui.chanels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.zulip.chat.app.domain.repo.ChannelsRepo
-import com.android.zulip.chat.app.ui.main.NavState
-import com.android.zulip.chat.app.ui.main.Navigator
+import com.android.zulip.chat.app.ui.main.navigation.NavState
+import com.android.zulip.chat.app.ui.main.navigation.Navigator
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -22,6 +22,7 @@ import com.android.zulip.chat.app.OWN_USER_ID
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.ui.chanels.ChannelsScreenHolder
 import com.android.zulip.chat.app.ui.chat.ChatScreenHolder
+import com.android.zulip.chat.app.ui.main.navigation.NavRoutes
 import com.android.zulip.chat.app.ui.people.PeopleScreenHolder
 import com.android.zulip.chat.app.ui.profile.ProfileScreenHolder
 

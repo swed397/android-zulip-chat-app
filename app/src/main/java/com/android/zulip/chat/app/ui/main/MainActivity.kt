@@ -6,20 +6,21 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.di.injectedViewModel
+import com.android.zulip.chat.app.ui.main.navigation.NavigationHandler
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var navigator: Navigator
+    lateinit var navigationHandler: NavigationHandler
 
     private lateinit var navController: NavHostController
 
@@ -29,38 +30,31 @@ class MainActivity : ComponentActivity() {
         (applicationContext as App).appComponent.inject(this)
 
         setContent {
-            MainHolder()
-        }
-
-        lifecycleScope.launch {
-            navigator.navigateFlow.collect(this@MainActivity::onNavEvent)
-        }
-    }
-
-    private fun onNavEvent(navState: NavState) {
-        when (navState) {
-            is NavState.ChannelsNav -> println("Try nav CHANNELS")
-            is NavState.PeoplesNav -> println("TRY NAV PEOPLES")
-            is NavState.ProfileNav -> navController.navigate("${NavRoutes.PROFILE.label}?userId=${navState.id}")
-            is NavState.OwnProfileNav -> navController.navigate(NavRoutes.OWN_PROFILE.label)
-            is NavState.ChatNav -> navController.navigate("${NavRoutes.CHAT.label}?streamName=${navState.streamName}&&topicName=${navState.topicName}")
+            MainHolder(navigationHandler)
         }
     }
 
     @Composable
-    private fun MainHolder() {
+    private fun MainHolder(navigationHandler: NavigationHandler) {
         val context = LocalContext.current.applicationContext
         injectedViewModel { (context as App).appComponent.mainActivityViewModelFactory.create() }
-        Main()
+        Main(navigationHandler)
     }
 
     @Composable
-    private fun Main() {
+    private fun Main(navigationHandler: NavigationHandler) {
         AndroidzulipchatappTheme {
             Surface(
                 color = MaterialTheme.colorScheme.background
             ) {
+                val lifecycle = LocalLifecycleOwner.current.lifecycle
                 navController = rememberNavController()
+
+                LaunchedEffect(Unit) {
+                    navigationHandler.invoke(navController)
+                    lifecycle.addObserver(navigationHandler)
+                }
+
                 MainScreen(navController)
             }
         }

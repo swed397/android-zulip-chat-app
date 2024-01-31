@@ -19,6 +19,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -105,8 +106,10 @@ private fun MessagesList(messages: List<MessageModel>) {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
-    coroutineScope.launch {
-        listState.animateScrollToItem(index = 0)
+    LaunchedEffect(messages) {
+        coroutineScope.launch {
+            listState.animateScrollToItem(index = 0)
+        }
     }
 
     LazyColumn(
