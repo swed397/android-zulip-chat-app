@@ -2,7 +2,6 @@ package com.android.zulip.chat.app.di.modules
 
 import android.content.Context
 import androidx.room.Room
-import com.android.zulip.chat.app.data.db.dao.StreamDao
 import com.android.zulip.chat.app.data.db.AppDb
 import com.android.zulip.chat.app.data.db.dao.EventDao
 import dagger.Module

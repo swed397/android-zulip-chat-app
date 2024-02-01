@@ -1,6 +1,5 @@
 package com.android.zulip.chat.app.ui.profile
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.zulip.chat.app.domain.repo.UserRepo

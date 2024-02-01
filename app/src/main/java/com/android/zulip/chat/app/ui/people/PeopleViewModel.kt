@@ -2,9 +2,8 @@ package com.android.zulip.chat.app.ui.people
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.zulip.chat.app.ui.main.navigation.NavState
 import com.android.zulip.chat.app.domain.repo.UserRepo
+import com.android.zulip.chat.app.ui.main.navigation.NavState
 import com.android.zulip.chat.app.ui.main.navigation.Navigator
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
