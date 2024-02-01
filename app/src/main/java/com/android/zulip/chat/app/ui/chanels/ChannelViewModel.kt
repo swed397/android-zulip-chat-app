@@ -53,11 +53,12 @@ class ChannelViewModel @AssistedInject constructor(
     private fun searchByFilter(searchText: String) {
         when (val state = _state.value) {
             is ChannelsState.Content -> {
-                val newData =
-                    state.allData.filter { it.name.contains(searchText, ignoreCase = true) }
-
                 viewModelScope.launch {
-                    _state.emit(state.copy(visibleData = newData))
+                    val newData = channelsRepo.getStreamsByNameLike(
+                        name = searchText,
+                        isSubscribed = state.streamType == StreamType.SUBSCRIBED
+                    )
+                    _state.emit(state.copy(data = channelMapper(newData)))
                 }
             }
 
@@ -68,7 +69,7 @@ class ChannelViewModel @AssistedInject constructor(
     private fun openStreamAction(id: Long) {
         when (val state = _state.value) {
             is ChannelsState.Content -> {
-                val mutableItems = state.allData.toMutableList()
+                val mutableItems = state.data.toMutableList()
                 val index = mutableItems.indexOfFirst { it.id == id }
                 val item = mutableItems[index]
                 mutableItems[index] = item.copy(isOpened = item.isOpened.not())
@@ -76,8 +77,7 @@ class ChannelViewModel @AssistedInject constructor(
                 viewModelScope.launch {
                     _state.emit(
                         ChannelsState.Content(
-                            allData = mutableItems,
-                            visibleData = mutableItems,
+                            data = mutableItems,
                             streamType = state.streamType
                         )
                     )
@@ -92,7 +92,7 @@ class ChannelViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val data = channelsRepo.getAllStreams()
             val uiData = channelMapper(data)
-            _state.emit(ChannelsState.Content(uiData, uiData, StreamType.ALL))
+            _state.emit(ChannelsState.Content(uiData, StreamType.ALL))
         }
     }
 
@@ -100,7 +100,7 @@ class ChannelViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val data = channelsRepo.getSubscribedStreams()
             val uiData = channelMapper(data)
-            _state.emit(ChannelsState.Content(uiData, uiData, StreamType.SUBSCRIBED))
+            _state.emit(ChannelsState.Content(uiData, StreamType.SUBSCRIBED))
         }
     }
 

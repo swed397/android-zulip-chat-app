@@ -7,4 +7,6 @@ interface ChannelsRepo {
     suspend fun getAllStreams(): List<StreamInfo>
 
     suspend fun getSubscribedStreams(): List<StreamInfo>
+
+    suspend fun getStreamsByNameLike(name: String, isSubscribed: Boolean = false): List<StreamInfo>
 }

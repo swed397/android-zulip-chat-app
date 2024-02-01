@@ -1,5 +1,7 @@
 package com.android.zulip.chat.app.di.modules
 
+import com.android.zulip.chat.app.data.db.AppDb
+import com.android.zulip.chat.app.data.db.dao.StreamDao
 import com.android.zulip.chat.app.data.network.ZulipApi
 import com.android.zulip.chat.app.data.network.repo.ChannelsRepoImpl
 import com.android.zulip.chat.app.di.scopes.ChannelsScope
@@ -13,7 +15,12 @@ class ChannelsModule {
 
     @Provides
     @ChannelsScope
-    fun providesChannelsRepo(zulipApi: ZulipApi) = ChannelsRepoImpl(zulipApi)
+    fun provideChannelsDao(appDb: AppDb): StreamDao = appDb.streamDao()
+
+    @Provides
+    @ChannelsScope
+    fun providesChannelsRepo(zulipApi: ZulipApi, streamDao: StreamDao) =
+        ChannelsRepoImpl(zulipApi, streamDao)
 
     @Module
     interface BindModule {

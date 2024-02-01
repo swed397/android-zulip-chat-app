@@ -77,7 +77,7 @@ private fun MainState(state: PeopleState.Content, onEvent: (PeopleEvent) -> Unit
             placeHolderString = "Users...",
             onClick = { onEvent.invoke(PeopleEvent.FilterData(it)) }
         )
-        UsersList(state::visibleItems, onEvent)
+        UsersList(state::data, onEvent)
     }
 }
 
@@ -152,7 +152,7 @@ private fun ScreenContentPreview() {
             )
         }
         PeopleScreen(
-            state = PeopleState.Content(items, items),
+            state = PeopleState.Content(items),
             onEvent = {}
         )
     }

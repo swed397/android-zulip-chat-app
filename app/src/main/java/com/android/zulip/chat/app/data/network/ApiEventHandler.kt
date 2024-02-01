@@ -1,21 +1,16 @@
 package com.android.zulip.chat.app.data.network
 
-import com.android.zulip.chat.app.domain.mapper.toDto
-import com.android.zulip.chat.app.domain.model.MessageModel
-import kotlinx.coroutines.channels.BufferOverflow
+import com.android.zulip.chat.app.data.db.dao.EventDao
+import com.android.zulip.chat.app.domain.mapper.toEntity
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.isActive
 import java.net.SocketTimeoutException
 import javax.inject.Inject
 
-class ApiEventHandler @Inject constructor(private val zulipApi: ZulipApi) {
-
-    //ToDo Временно (тесты)
-    private val _event =
-        MutableSharedFlow<List<MessageModel>>(onBufferOverflow = BufferOverflow.SUSPEND)
-    val event: SharedFlow<List<MessageModel>> = _event
+class ApiEventHandler @Inject constructor(
+    private val zulipApi: ZulipApi,
+    private val eventDao: EventDao
+) {
 
     suspend fun handleEvent() {
         coroutineScope {
@@ -30,7 +25,9 @@ class ApiEventHandler @Inject constructor(private val zulipApi: ZulipApi) {
                             lastEventId = eventId
                         )
                     eventId = response.events.maxOf { it.id }
-                    response.events.map { it.message.toDto() }
+                    response.events.map { it.message.toEntity() }.apply {
+                        eventDao.insertNewMessages(this)
+                    }
                 }
                     .onFailure { exception ->
                         if (exception is SocketTimeoutException) {
@@ -39,7 +36,6 @@ class ApiEventHandler @Inject constructor(private val zulipApi: ZulipApi) {
                         throw exception
                     }
                     .onSuccess {
-                        _event.emit(it)
                         return@onSuccess
                     }
             }

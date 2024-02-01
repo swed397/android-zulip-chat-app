@@ -11,14 +11,38 @@ data class EventRegisterQueueRs(
 data class EventResponse(
 
     @SerializedName("events")
-    val events: List<MessageEvent>,
+    val events: List<Event>,
+)
+
+data class Event(
+
+    @SerializedName("message")
+    val message: MessageEvent,
+
+    @SerializedName("id")
+    val id: Long
 )
 
 data class MessageEvent(
 
-    @SerializedName("message")
-    val message: Message,
-
     @SerializedName("id")
-    val id: Long
+    val id: Long,
+
+    @SerializedName("sender_id")
+    val senderId: Long,
+
+    @SerializedName("sender_full_name")
+    val senderFullName: String,
+
+    @SerializedName("avatar_url")
+    val avatarUrl: String,
+
+    @SerializedName("content")
+    val content: String,
+
+    @SerializedName("subject")
+    val topicName: String,
+
+    @SerializedName("display_recipient")
+    val streamName: String
 )

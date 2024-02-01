@@ -10,11 +10,11 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ChatViewModel @AssistedInject constructor(
     private val chatRepo: ChatRepo,
-    private val apiEventHandler: ApiEventHandler,
     @Assisted("streamName") streamName: String,
     @Assisted("topicName") topicName: String,
 ) : ViewModel() {
@@ -24,32 +24,26 @@ class ChatViewModel @AssistedInject constructor(
 
     init {
         getAllMessages(streamName = streamName, topicName = topicName)
-        handleApiEvent()
+        subscribeOnMessagesFlow(streamName = streamName, topicName = topicName)
     }
 
     private fun getAllMessages(streamName: String, topicName: String) {
         viewModelScope.launch {
-            val result = chatRepo.getAllMassagesByStreamNameAndTopicName(
+            val data = chatRepo.getAllMassagesByStreamNameAndTopicName(
                 streamName = streamName,
                 topicName = topicName
             )
-            _state.emit(ChatState.Content(result))
+            _state.emit(ChatState.Content(data))
         }
     }
 
-    //ToDo Временно (тесты)
-    private fun handleApiEvent() {
+    private fun subscribeOnMessagesFlow(streamName: String, topicName: String) {
         viewModelScope.launch {
-            apiEventHandler.event.collect { event ->
-                when (val currentState = _state.value) {
-                    is ChatState.Content -> {
-                        val newData: List<MessageModel> =
-                            event + currentState.messagesData.toMutableList()
-                        _state.emit(ChatState.Content(messagesData = newData))
-                    }
-
-                    is ChatState.Loading -> {}
-                }
+            chatRepo.subscribeOnMessagesFlow(
+                streamName = streamName,
+                topicName = topicName
+            ).collect {
+                _state.emit(ChatState.Content(it))
             }
         }
     }

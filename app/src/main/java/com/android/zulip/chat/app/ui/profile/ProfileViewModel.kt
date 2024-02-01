@@ -28,7 +28,6 @@ class ProfileViewModel @AssistedInject constructor(
     private fun getUserById(userId: Long) {
         viewModelScope.launch {
 
-            Log.d("USER INFO", userId.toString())
             val user = userRepo.getUserById(userId)
             _state.emit(ProfileState.Content(profileUiMapper(user)))
         }

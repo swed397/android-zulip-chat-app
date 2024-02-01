@@ -116,7 +116,7 @@ private fun ChanelTabs(state: ChannelsState.Content, onEvent: (ChannelsEvent) ->
 @Composable
 private fun StreamsList(state: ChannelsState.Content, onEvent: (ChannelsEvent) -> Unit) {
     LazyColumn {
-        items(items = state.visibleData, key = { it.id }) {
+        items(items = state.data, key = { it.id }) {
             StreamListItem(it, onEvent)
             Divider(color = Color.Gray, thickness = 1.dp)
         }
@@ -248,8 +248,7 @@ class PreviewStateProvider : PreviewParameterProvider<ChannelsState> {
         )
 
         val content = ChannelsState.Content(
-            allData = items,
-            visibleData = items,
+            data = items,
             streamType = StreamType.SUBSCRIBED
         )
     }

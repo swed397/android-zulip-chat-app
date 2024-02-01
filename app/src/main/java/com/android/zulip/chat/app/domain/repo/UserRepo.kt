@@ -8,4 +8,6 @@ interface UserRepo {
     suspend fun getAllUsers(): List<UserModel>
 
     suspend fun getUserById(userId: Long): CurrentUserModel
+
+    suspend fun getUsersByNameLike(name: String): List<UserModel>
 }
