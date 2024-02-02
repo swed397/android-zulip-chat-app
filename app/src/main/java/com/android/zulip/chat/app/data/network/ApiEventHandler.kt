@@ -25,9 +25,7 @@ class ApiEventHandler @Inject constructor(
                             lastEventId = eventId
                         )
                     eventId = response.events.maxOf { it.id }
-                    response.events.map { it.message.toEntity() }.apply {
-                        eventDao.insertNewMessages(this)
-                    }
+                    response
                 }
                     .onFailure { exception ->
                         if (exception is SocketTimeoutException) {
@@ -36,6 +34,9 @@ class ApiEventHandler @Inject constructor(
                         throw exception
                     }
                     .onSuccess {
+                        it.events.map { message -> message.message.toEntity() }.apply {
+                            eventDao.insertNewMessages(this)
+                        }
                         return@onSuccess
                     }
             }
