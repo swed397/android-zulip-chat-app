@@ -4,6 +4,7 @@ import com.android.zulip.chat.app.data.network.model.EventRegisterQueueRs
 import com.android.zulip.chat.app.data.network.model.EventResponse
 import com.android.zulip.chat.app.data.network.model.Members
 import com.android.zulip.chat.app.data.network.model.MessagesResponse
+import com.android.zulip.chat.app.data.network.model.SendMessageResponse
 import com.android.zulip.chat.app.data.network.model.Streams
 import com.android.zulip.chat.app.data.network.model.SubscribedStreams
 import com.android.zulip.chat.app.data.network.model.Topics
@@ -46,4 +47,12 @@ interface ZulipApi {
         @Query("queue_id") queueId: String,
         @Query("last_event_id") lastEventId: Long = -1
     ): EventResponse
+
+    @POST("messages")
+    suspend fun sendMessage(
+        @Query("type") type: String = "stream",
+        @Query("to") to: String,
+        @Query("topic") topic: String,
+        @Query("content") content: String,
+    ): SendMessageResponse
 }

@@ -2,8 +2,10 @@ package com.android.zulip.chat.app.data.network.repo
 
 import com.android.zulip.chat.app.data.db.dao.ChatDao
 import com.android.zulip.chat.app.data.network.ZulipApi
+import com.android.zulip.chat.app.data.network.model.MessagesResponse
 import com.android.zulip.chat.app.data.network.model.Narrow
 import com.android.zulip.chat.app.data.network.model.NarrowType
+import com.android.zulip.chat.app.data.network.model.SendMessageResponse
 import com.android.zulip.chat.app.domain.mapper.toDto
 import com.android.zulip.chat.app.domain.mapper.toEntity
 import com.android.zulip.chat.app.domain.model.MessageModel
@@ -52,4 +54,15 @@ class ChatRepoImpl @Inject constructor(
             streamName = streamName,
             topicName = topicName
         ).map { it.map { messageEntity -> messageEntity.toDto() } }
+
+    override suspend fun sendMessage(
+        streamName: String,
+        topicName: String,
+        message: String
+    ): SendMessageResponse =
+        zulipApi.sendMessage(
+            to = streamName,
+            topic = topicName,
+            content = message
+        )
 }

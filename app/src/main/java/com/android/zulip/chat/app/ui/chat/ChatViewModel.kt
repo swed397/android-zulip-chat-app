@@ -12,8 +12,8 @@ import kotlinx.coroutines.launch
 
 class ChatViewModel @AssistedInject constructor(
     private val chatRepo: ChatRepo,
-    @Assisted("streamName") streamName: String,
-    @Assisted("topicName") topicName: String,
+    @Assisted("streamName") val streamName: String,
+    @Assisted("topicName") val topicName: String,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<ChatState>(ChatState.Loading)
@@ -22,6 +22,22 @@ class ChatViewModel @AssistedInject constructor(
     init {
         getAllMessages(streamName = streamName, topicName = topicName)
         subscribeOnMessagesFlow(streamName = streamName, topicName = topicName)
+    }
+
+    fun obtainEvent(chatEvent: ChatEvent) {
+        when (chatEvent) {
+            is ChatEvent.SendMessage -> {
+                viewModelScope.launch {
+                    if (chatEvent.message.isEmpty().not()) {
+                        chatRepo.sendMessage(
+                            streamName = streamName,
+                            topicName = topicName,
+                            message = chatEvent.message
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun getAllMessages(streamName: String, topicName: String) {

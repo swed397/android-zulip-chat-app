@@ -34,6 +34,24 @@ data class Narrow(
     val operand: String
 )
 
+data class SendMessageResponse(
+
+    @SerializedName("id")
+    val id: Long,
+
+    @SerializedName("result")
+    val result: ResultTypeResponse,
+)
+
 enum class NarrowType(val stringValue: String) {
     STREAM_OPERATOR("stream"), TOPIC_OPERATOR("topic")
+}
+
+enum class ResultTypeResponse {
+
+    @SerializedName("success")
+    SUCCESS,
+
+    @SerializedName("error")
+    ERROR
 }
