@@ -2,7 +2,6 @@ package com.android.zulip.chat.app.data.network.repo
 
 import com.android.zulip.chat.app.data.db.dao.ChatDao
 import com.android.zulip.chat.app.data.network.ZulipApi
-import com.android.zulip.chat.app.data.network.model.MessagesResponse
 import com.android.zulip.chat.app.data.network.model.Narrow
 import com.android.zulip.chat.app.data.network.model.NarrowType
 import com.android.zulip.chat.app.data.network.model.SendMessageResponse
