@@ -1,6 +1,8 @@
 package com.android.zulip.chat.app.ui.chat
 
-import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -21,6 +23,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -37,7 +41,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -180,32 +188,90 @@ private fun UpBar(streamName: String, topicName: String) {
     }
 }
 
-@SuppressLint("CoroutineCreationDuringComposition")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MessagesList(messages: List<MessageModel>) {
-    //ToDo ??? мб лучше
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+    var fabIsVisible by remember { mutableStateOf(false) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (available.y < -10 && listState.firstVisibleItemIndex == 0) {
+                    fabIsVisible = false
+                }
+
+                if (available.y > 10) {
+                    fabIsVisible = true
+                }
+
+                return Offset.Zero
+            }
+        }
+    }
 
     LaunchedEffect(messages) {
         coroutineScope.launch {
-            listState.animateScrollToItem(index = 0)
+            if (listState.firstVisibleItemIndex == 0 || listState.firstVisibleItemIndex == 1) {
+                listState.animateScrollToItem(index = 0)
+            }
         }
     }
 
-    LazyColumn(
-        state = listState,
-        reverseLayout = true,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 10.dp)
-    ) {
-        items(items = messages, key = { it.messageId }) { message ->
-            MessageItem(message = message)
-            Divider(thickness = 5.dp, color = Color.Transparent)
+    Scaffold(
+        floatingActionButtonPosition = FabPosition.End,
+        floatingActionButton = {
+            FloatingActionButtonDown(
+                visibilityState = fabIsVisible,
+                onClick = {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(index = 0)
+                        fabIsVisible = false
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        LazyColumn(
+            state = listState,
+            reverseLayout = true,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 10.dp)
+                .nestedScroll(nestedScrollConnection)
+        ) {
+            items(items = messages, key = { it.messageId }) { message ->
+                MessageItem(message = message)
+                Divider(thickness = 5.dp, color = Color.Transparent)
+            }
         }
     }
 }
+
+@Composable
+private fun FloatingActionButtonDown(
+    visibilityState: Boolean,
+    onClick: () -> Unit
+) {
+    AnimatedVisibility(
+        visible = visibilityState,
+        enter = slideInVertically(initialOffsetY = { it * 2 }),
+        exit = slideOutVertically(targetOffsetY = { it * 2 }),
+    ) {
+        ExtendedFloatingActionButton(
+            onClick = onClick,
+            modifier = Modifier
+                .padding(end = 20.dp, bottom = 20.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_arrow_drop_down_circle_24),
+                tint = MaterialTheme.colorScheme.primary,
+                contentDescription = ""
+            )
+        }
+    }
+}
+
 
 @Composable
 private fun MessageItem(message: MessageModel) {
