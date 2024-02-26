@@ -6,4 +6,6 @@ sealed interface ChannelsState {
         val data: List<StreamUiModel>,
         val streamType: StreamType
     ) : ChannelsState
+
+    object Error : ChannelsState
 }

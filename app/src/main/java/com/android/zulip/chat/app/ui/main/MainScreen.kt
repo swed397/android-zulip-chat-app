@@ -18,7 +18,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.android.zulip.chat.app.OWN_USER_ID
+import com.android.zulip.chat.app.utils.OWN_USER_ID
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.ui.chanels.ChannelsScreenHolder
 import com.android.zulip.chat.app.ui.chat.ChatScreenHolder

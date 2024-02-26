@@ -3,6 +3,7 @@ package com.android.zulip.chat.app.ui.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.zulip.chat.app.domain.repo.UserRepo
+import com.android.zulip.chat.app.utils.runSuspendCatching
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -26,9 +27,11 @@ class ProfileViewModel @AssistedInject constructor(
 
     private fun getUserById(userId: Long) {
         viewModelScope.launch {
-
-            val user = userRepo.getUserById(userId)
-            _state.emit(ProfileState.Content(profileUiMapper(user)))
+            runSuspendCatching(
+                action = { userRepo.getUserById(userId) },
+                onSuccess = { user -> _state.value = ProfileState.Content(profileUiMapper(user)) },
+                onError = { _state.value = ProfileState.Error }
+            )
         }
     }
 

@@ -7,4 +7,5 @@ sealed interface PeopleState {
     data class Content(
         val data: List<UserModel>,
     ) : PeopleState
+    object Error: PeopleState
 }

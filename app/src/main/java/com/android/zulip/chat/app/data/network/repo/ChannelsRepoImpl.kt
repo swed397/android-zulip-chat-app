@@ -5,6 +5,7 @@ import com.android.zulip.chat.app.data.network.ZulipApi
 import com.android.zulip.chat.app.data.network.model.StreamInfo
 import com.android.zulip.chat.app.domain.mapper.toEntity
 import com.android.zulip.chat.app.domain.repo.ChannelsRepo
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 class ChannelsRepoImpl @Inject constructor(
@@ -13,6 +14,8 @@ class ChannelsRepoImpl @Inject constructor(
 ) : ChannelsRepo {
 
     override suspend fun getAllStreams(): List<StreamInfo> {
+
+        //todo Fix
         val subscribedStreamsIdList =
             zulipApi.getSubscribedStreams().subscriptions.map { it.streamId }
         zulipApi.getAllStreams().streams.map { stream ->
@@ -28,6 +31,7 @@ class ChannelsRepoImpl @Inject constructor(
         }
 
         return streamDao.getAllStreamsWithTopics().map { it.toEntity() }
+
     }
 
 

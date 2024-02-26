@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.android.zulip.chat.app.domain.repo.ChannelsRepo
 import com.android.zulip.chat.app.ui.main.navigation.NavState
 import com.android.zulip.chat.app.ui.main.navigation.Navigator
+import com.android.zulip.chat.app.utils.runSuspendCatching
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,15 +55,23 @@ class ChannelViewModel @AssistedInject constructor(
         when (val state = _state.value) {
             is ChannelsState.Content -> {
                 viewModelScope.launch {
-                    val newData = channelsRepo.getStreamsByNameLike(
-                        name = searchText,
-                        isSubscribed = state.streamType == StreamType.SUBSCRIBED
+                    runSuspendCatching(
+                        action = {
+                            channelsRepo.getStreamsByNameLike(
+                                name = searchText,
+                                isSubscribed = state.streamType == StreamType.SUBSCRIBED
+                            )
+                        },
+                        onSuccess = { data ->
+                            _state.value = state.copy(data = channelMapper(data))
+                        },
+                        onError = {}
                     )
-                    _state.emit(state.copy(data = channelMapper(newData)))
                 }
             }
 
             ChannelsState.Loading -> {}
+            ChannelsState.Error -> {}
         }
     }
 
@@ -85,22 +94,31 @@ class ChannelViewModel @AssistedInject constructor(
             }
 
             is ChannelsState.Loading -> {}
+            is ChannelsState.Error -> {}
         }
     }
 
     private fun getAllStreams() {
         viewModelScope.launch {
-            val data = channelsRepo.getAllStreams()
-            val uiData = channelMapper(data)
-            _state.emit(ChannelsState.Content(uiData, StreamType.ALL))
+            runSuspendCatching(
+                action = { channelsRepo.getAllStreams() },
+                onSuccess = { data ->
+                    _state.value = ChannelsState.Content(channelMapper(data), StreamType.ALL)
+                },
+                onError = { _state.value = ChannelsState.Error }
+            )
         }
     }
 
     private fun getSubscribedStreams() {
         viewModelScope.launch {
-            val data = channelsRepo.getSubscribedStreams()
-            val uiData = channelMapper(data)
-            _state.emit(ChannelsState.Content(uiData, StreamType.SUBSCRIBED))
+            runSuspendCatching(
+                action = { channelsRepo.getSubscribedStreams() },
+                onSuccess = { data ->
+                    _state.value = ChannelsState.Content(channelMapper(data), StreamType.SUBSCRIBED)
+                },
+                onError = { _state.value = ChannelsState.Error }
+            )
         }
     }
 

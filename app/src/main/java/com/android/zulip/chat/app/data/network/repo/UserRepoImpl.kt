@@ -8,6 +8,7 @@ import com.android.zulip.chat.app.domain.model.CurrentUserModel
 import com.android.zulip.chat.app.domain.model.UserModel
 import com.android.zulip.chat.app.domain.repo.UserRepo
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 class UserRepoImpl @Inject constructor(
     private val zulipApi: ZulipApi,
@@ -15,8 +16,14 @@ class UserRepoImpl @Inject constructor(
 ) : UserRepo {
 
     override suspend fun getAllUsers(): List<UserModel> {
-        zulipApi.getAllUsers().members.map { it.toEntity() }.apply {
-            userDao.insertUsers(this)
+        try {
+            zulipApi.getAllUsers().members.map { it.toEntity() }.apply {
+                userDao.insertUsers(this)
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: RuntimeException) {
+            println(e)
         }
 
         return userDao.getAllUsers().map { it.toEntity() }

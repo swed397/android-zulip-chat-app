@@ -32,6 +32,9 @@ import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.di.injectedViewModel
 import com.android.zulip.chat.app.ui.Preloader
+import com.android.zulip.chat.app.ui.profile.components.Avatar
+import com.android.zulip.chat.app.ui.profile.components.ProfileErrorScreen
+import com.android.zulip.chat.app.ui.profile.components.ProfileInfo
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
 
 
@@ -59,6 +62,7 @@ private fun ProfileScreen(state: ProfileState) {
         when (state) {
             is ProfileState.Loading -> Preloader()
             is ProfileState.Content -> MainState(user = state.userModel)
+            is ProfileState.Error -> ProfileErrorScreen()
         }
     }
 }
@@ -70,45 +74,8 @@ private fun MainState(user: ProfileUiModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        if (user.avatarUrl.isNullOrEmpty()) {
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_sentiment_satisfied_alt_24),
-                contentDescription = null,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(percent = 20))
-                    .align(Alignment.CenterHorizontally)
-                    .size(300.dp, 300.dp)
-            )
-        } else {
-            SubcomposeAsyncImage(
-                model = user.avatarUrl,
-                contentDescription = null,
-                loading = { CircularProgressIndicator() },
-                modifier = Modifier
-                    .clip(RoundedCornerShape(percent = 20))
-                    .align(Alignment.CenterHorizontally)
-                    .size(300.dp, 300.dp)
-            )
-        }
-        Row {
-            Text(
-                text = user.name,
-                fontSize = 30.sp,
-                color = Color.Cyan
-            )
-            Divider(
-                color = Color.Transparent,
-                modifier = Modifier
-                    .height(10.dp)
-                    .width(10.dp)
-            )
-            Text(
-                text = user.statusText,
-                textAlign = TextAlign.Center,
-                color = user.color,
-                fontSize = 30.sp,
-            )
-        }
+        Avatar(avatarUrl = user.avatarUrl)
+        ProfileInfo(userName = user.name, userStatus = user.statusText, userColor = user.color)
     }
 }
 

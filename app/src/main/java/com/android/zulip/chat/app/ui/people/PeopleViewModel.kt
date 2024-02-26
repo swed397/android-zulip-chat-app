@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.android.zulip.chat.app.domain.repo.UserRepo
 import com.android.zulip.chat.app.ui.main.navigation.NavState
 import com.android.zulip.chat.app.ui.main.navigation.Navigator
+import com.android.zulip.chat.app.utils.runSuspendCatching
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,8 +33,11 @@ class PeopleViewModel @AssistedInject constructor(
 
     private fun getAllUsers() {
         viewModelScope.launch {
-            val data = userRepo.getAllUsers()
-            _state.emit(PeopleState.Content(data))
+            runSuspendCatching(
+                action = { userRepo.getAllUsers() },
+                onSuccess = { data -> _state.value = PeopleState.Content(data) },
+                onError = { _state.value = PeopleState.Error }
+            )
         }
     }
 
@@ -41,12 +45,16 @@ class PeopleViewModel @AssistedInject constructor(
         when (val state = _state.value) {
             is PeopleState.Content -> {
                 viewModelScope.launch {
-                    val newData = userRepo.getUsersByNameLike(searchText)
-                    _state.emit(state.copy(data = newData))
+                    runSuspendCatching(
+                        action = { userRepo.getUsersByNameLike(searchText) },
+                        onSuccess = { data -> _state.value = state.copy(data = data) },
+                        onError = { _state.value = PeopleState.Error }
+                    )
                 }
             }
 
             is PeopleState.Loading -> {}
+            PeopleState.Error -> {}
         }
     }
 

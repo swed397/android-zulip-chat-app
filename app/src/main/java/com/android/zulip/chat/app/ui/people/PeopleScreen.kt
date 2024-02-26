@@ -32,6 +32,8 @@ import com.android.zulip.chat.app.di.injectedViewModel
 import com.android.zulip.chat.app.domain.model.UserModel
 import com.android.zulip.chat.app.ui.Preloader
 import com.android.zulip.chat.app.ui.SearchBar
+import com.android.zulip.chat.app.ui.people.components.UserListErrorScreen
+import com.android.zulip.chat.app.ui.people.components.UsersList
 import com.android.zulip.chat.app.ui.theme.AndroidzulipchatappTheme
 
 @Composable
@@ -63,6 +65,8 @@ private fun PeopleScreen(state: PeopleState, onEvent: (PeopleEvent) -> Unit) {
                 state = state,
                 onEvent = onEvent
             )
+
+            PeopleState.Error -> UserListErrorScreen()
         }
     }
 }
@@ -79,53 +83,6 @@ private fun MainState(state: PeopleState.Content, onEvent: (PeopleEvent) -> Unit
         )
         UsersList(state::data, onEvent)
     }
-}
-
-@Composable
-private fun UsersList(data: () -> List<UserModel>, onEvent: (PeopleEvent) -> Unit) {
-    LazyColumn {
-        items(data.invoke()) { item ->
-            UserListItem(
-                userId = item.id,
-                name = item.name,
-                email = item.email ?: "No email",
-                avatarUrls = item.avatarUrl,
-                onEvent = onEvent
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun UserListItem(
-    userId: Long,
-    name: String,
-    email: String,
-    avatarUrls: String?,
-    onEvent: (PeopleEvent) -> Unit
-) {
-    ListItem(
-        headlineText = { Text(text = name) },
-        supportingText = { Text(text = email) },
-        leadingContent = {
-            if (avatarUrls.isNullOrEmpty()) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_sentiment_satisfied_alt_24),
-                    contentDescription = null
-                )
-            } else
-                SubcomposeAsyncImage(
-                    model = avatarUrls,
-                    contentDescription = null,
-                    loading = { CircularProgressIndicator() },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(percent = 50))
-                )
-        },
-        modifier = Modifier.clickable { onEvent.invoke(PeopleEvent.NavigateToUser(userId)) }
-    )
-    Divider(color = Color.Gray, thickness = 1.dp)
 }
 
 @Composable
