@@ -5,7 +5,6 @@ import com.android.zulip.chat.app.data.network.ZulipApi
 import com.android.zulip.chat.app.data.network.model.StreamInfo
 import com.android.zulip.chat.app.domain.mapper.toEntity
 import com.android.zulip.chat.app.domain.repo.ChannelsRepo
-import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 class ChannelsRepoImpl @Inject constructor(
