@@ -39,7 +39,7 @@ interface ZulipApi {
 
     @POST("register")
     suspend fun registerEvent(
-        @Query("event_types") eventType: String = """["message"]""",
+        @Query("event_types") eventType: String = """["message", "reaction"]""",
     ): EventRegisterQueueRs
 
     @GET("events")

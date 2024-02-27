@@ -5,5 +5,5 @@ import com.android.zulip.chat.app.domain.model.MessageModel
 sealed interface ChatState {
 
     object Loading : ChatState
-    data class Content(val messagesData: List<MessageModel>) : ChatState
+    data class Content(val messagesData: List<MessageUiModel>) : ChatState
 }

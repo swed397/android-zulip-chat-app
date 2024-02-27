@@ -16,6 +16,21 @@ data class EventResponse(
 
 data class Event(
 
+    @SerializedName("type")
+    val type: EventType,
+
+    @SerializedName("op")
+    val opType: OpType,
+
+    @SerializedName("user_id")
+    val userId: Long,
+
+    @SerializedName("message_id")
+    val messageId: Long,
+
+    @SerializedName("emoji_code")
+    val emojiCode: String,
+
     @SerializedName("message")
     val message: MessageEvent,
 
@@ -46,3 +61,21 @@ data class MessageEvent(
     @SerializedName("display_recipient")
     val streamName: String
 )
+
+enum class EventType {
+
+    @SerializedName("message")
+    MESSAGE,
+
+    @SerializedName("reaction")
+    REACTION
+}
+
+enum class OpType {
+
+    @SerializedName("add")
+    ADD,
+
+    @SerializedName("remove")
+    REMOVE
+}

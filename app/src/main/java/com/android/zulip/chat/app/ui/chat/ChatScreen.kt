@@ -58,6 +58,9 @@ import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.di.injectedViewModel
 import com.android.zulip.chat.app.domain.model.MessageModel
 import com.android.zulip.chat.app.ui.Preloader
+import com.android.zulip.chat.app.ui.chat.components.ChatAppBar
+import com.android.zulip.chat.app.ui.chat.components.ChatBottomBar
+import com.android.zulip.chat.app.ui.chat.components.MessageItem
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -87,8 +90,8 @@ private fun ChatScreen(
     onEvent: (chatEvent: ChatEvent) -> Unit
 ) {
     Scaffold(
-        topBar = { UpBar(streamName = streamName, topicName = topicName) },
-        bottomBar = { BottomBar(onSendMessageEvent = onEvent) },
+        topBar = { ChatAppBar(streamName = streamName, topicName = topicName) },
+        bottomBar = { ChatBottomBar(onSendMessageEvent = onEvent) },
         content = { padding ->
             Box(
                 contentAlignment = Alignment.Center,
@@ -112,85 +115,7 @@ private fun ChatScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun BottomBar(onSendMessageEvent: (chatEvent: ChatEvent) -> Unit) {
-    Box(
-        contentAlignment = Alignment.CenterStart,
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .background(Color.Blue)
-    ) {
-        Row {
-            var text by remember { mutableStateOf("") }
-
-            TextField(
-                value = text,
-                onValueChange = { text = it },
-                placeholder = {
-                    Text(
-                        "Написать...",
-                        color = Color.Yellow,
-                    )
-                },
-                singleLine = false,
-                maxLines = 4,
-                modifier = Modifier
-                    .padding(top = 5.dp, bottom = 5.dp, start = 10.dp)
-                    .height(IntrinsicSize.Min)
-                    .heightIn(min = 51.dp)
-                    .width(334.dp)
-                    .clip(RoundedCornerShape(20.dp))
-            )
-
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_send_24),
-                tint = MaterialTheme.colorScheme.primary,
-                contentDescription = "",
-                modifier = Modifier
-                    .width(39.dp)
-                    .height(39.dp)
-                    .align(Alignment.CenterVertically)
-                    .padding(start = 8.dp)
-                    .clickable {
-                        onSendMessageEvent.invoke(ChatEvent.SendMessage(text))
-                        text = ""
-                    }
-            )
-        }
-    }
-}
-
-@Composable
-private fun UpBar(streamName: String, topicName: String) {
-    Column {
-        Row(
-            modifier = Modifier
-                .height(63.dp)
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.primary)
-        ) {
-            Text(
-                text = "#$streamName",
-                fontSize = 24.sp,
-                modifier = Modifier.padding(top = 20.dp)
-            )
-        }
-        Text(
-            text = "Topic: #$topicName",
-            fontSize = 20.sp,
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .height(40.dp)
-                .fillMaxWidth()
-                .background(color = Color.Black)
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun MessagesList(messages: List<MessageModel>) {
+private fun MessagesList(messages: List<MessageUiModel>) {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     var fabIsVisible by remember { mutableStateOf(false) }
@@ -272,92 +197,36 @@ private fun FloatingActionButtonDown(
     }
 }
 
-
-@Composable
-private fun MessageItem(message: MessageModel) {
-    Row(
-        modifier = Modifier.padding(start = 12.dp)
-    ) {
-        CircleIcon(avatarUrl = message.avatarUrl, onClickableImage = {})
-        MessageContentItem(message = message)
-    }
-}
-
-@Composable
-private fun MessageContentItem(message: MessageModel) {
-    Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(10.dp))
-            .widthIn(max = 217.dp)
-            .background(Color.Black)
-            .padding(start = 10.dp, end = 8.dp, bottom = 5.dp)
-
-    ) {
-        SenderNameItem(senderName = message.userFullName)
-        MessageContent(messageContent = message.messageContent)
-    }
-}
-
-@Composable
-private fun MessageContent(messageContent: String) {
-    Text(
-        text = messageContent,
-        textAlign = TextAlign.Center,
-        color = Color.White,
-        fontSize = 16.sp
-    )
-}
-
-@Composable
-private fun SenderNameItem(senderName: String) {
-    Text(
-        text = senderName,
-        fontSize = 14.sp,
-        color = MaterialTheme.colorScheme.primary,
-    )
-}
-
-@Composable
-private fun CircleIcon(
-    avatarUrl: String,
-    onClickableImage: () -> Unit,
-) {
-    AsyncImage(
-        model = avatarUrl,
-        contentDescription = "",
-        modifier = Modifier
-            .clickable { onClickableImage.invoke() }
-            .clip(RoundedCornerShape(100))
-    )
-}
-
 @Composable
 @Preview
 private fun ChatScreenPreview() {
     val data = listOf(
-        MessageModel(
+        MessageUiModel(
             messageId = 1,
             messageContent = "Test",
             userId = 1,
             userFullName = "Test Test",
             messageTimestamp = LocalDateTime.now(),
-            avatarUrl = ""
+            avatarUrl = "",
+            ownMessage = false
         ),
-        MessageModel(
+        MessageUiModel(
             messageId = 2,
             messageContent = "Test2",
             userId = 1,
             userFullName = "Test2 Test2",
             messageTimestamp = LocalDateTime.now(),
-            avatarUrl = ""
+            avatarUrl = "",
+            ownMessage = true
         ),
-        MessageModel(
+        MessageUiModel(
             messageId = 3,
             messageContent = "Test3",
             userId = 1,
             userFullName = "Test3 Test3",
             messageTimestamp = LocalDateTime.now(),
-            avatarUrl = ""
+            avatarUrl = "",
+            ownMessage = false
         )
     )
 

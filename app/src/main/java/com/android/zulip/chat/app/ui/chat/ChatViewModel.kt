@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 
 class ChatViewModel @AssistedInject constructor(
     private val chatRepo: ChatRepo,
+    private val messageUiMapper: MessageUiMapper,
     @Assisted("streamName") val streamName: String,
     @Assisted("topicName") val topicName: String,
 ) : ViewModel() {
@@ -46,7 +47,7 @@ class ChatViewModel @AssistedInject constructor(
                 streamName = streamName,
                 topicName = topicName
             )
-            _state.emit(ChatState.Content(data))
+            _state.emit(ChatState.Content(messageUiMapper(data)))
         }
     }
 
@@ -56,7 +57,7 @@ class ChatViewModel @AssistedInject constructor(
                 streamName = streamName,
                 topicName = topicName
             ).collect {
-                _state.emit(ChatState.Content(it))
+                _state.emit(ChatState.Content(messageUiMapper(it)))
             }
         }
     }
