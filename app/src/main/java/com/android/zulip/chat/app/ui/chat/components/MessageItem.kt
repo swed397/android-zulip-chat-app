@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.android.zulip.chat.app.domain.model.MessageModel
 import com.android.zulip.chat.app.ui.chat.MessageUiModel
 import java.time.LocalDateTime
 

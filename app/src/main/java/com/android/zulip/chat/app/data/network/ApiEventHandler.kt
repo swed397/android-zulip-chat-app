@@ -1,10 +1,7 @@
 package com.android.zulip.chat.app.data.network
 
 import com.android.zulip.chat.app.data.db.dao.EventDao
-import com.android.zulip.chat.app.data.network.model.EventType
 import com.android.zulip.chat.app.domain.mapper.toEntity
-import com.android.zulip.chat.app.utils.toEmojiCode
-import com.android.zulip.chat.app.utils.toEmojiString
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
 import java.net.SocketTimeoutException
