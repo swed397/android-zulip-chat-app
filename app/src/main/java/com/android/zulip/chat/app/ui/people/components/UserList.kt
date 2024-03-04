@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.domain.model.UserModel
-import com.android.zulip.chat.app.domain.people.PeopleEvent
 
 @Composable
 fun UsersList(data: () -> List<UserModel>, onUserClick: (Long) -> Unit) {

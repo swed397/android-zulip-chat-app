@@ -12,9 +12,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 abstract class BaseViewModel<T, S, U, V>(
-    private val stateController: BaseStateController<T, S, U>,
+    stateController: BaseStateController<T, S, U>,
     private val baseUiMapper: BaseUiMapper<T, V>,
-    private val initEvent: U
+    initEvent: U
 ) : ViewModel() {
 
     val state: StateFlow<V> = stateController.state

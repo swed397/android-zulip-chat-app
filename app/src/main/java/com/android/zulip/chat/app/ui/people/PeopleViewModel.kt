@@ -14,7 +14,7 @@ import dagger.assisted.AssistedInject
 
 class PeopleViewModel @AssistedInject constructor(
     private val stateController: PeopleStateController,
-    private val peopleUiMapper: PeopleUiMapper,
+    peopleUiMapper: PeopleUiMapper,
     private val userRepo: UserRepo,
     private val navigator: Navigator
 ) : BaseViewModel<PeopleState, PeopleAction, PeopleEvent, PeopleUiState>(
