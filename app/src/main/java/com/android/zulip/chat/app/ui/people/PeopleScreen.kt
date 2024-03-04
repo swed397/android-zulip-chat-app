@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.di.injectedViewModel
 import com.android.zulip.chat.app.domain.model.UserModel
+import com.android.zulip.chat.app.domain.people.PeopleEvent
 import com.android.zulip.chat.app.ui.Preloader
 import com.android.zulip.chat.app.ui.SearchBar
 import com.android.zulip.chat.app.ui.people.components.UserListErrorScreen
@@ -37,7 +38,7 @@ fun PeopleScreenHolder() {
 }
 
 @Composable
-private fun PeopleScreen(state: PeopleState, onEvent: (PeopleEvent) -> Unit) {
+private fun PeopleScreen(state: PeopleUiState, onEvent: (PeopleEvent.Ui) -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -45,28 +46,33 @@ private fun PeopleScreen(state: PeopleState, onEvent: (PeopleEvent) -> Unit) {
             .background(Color.Magenta)
     ) {
         when (state) {
-            is PeopleState.Loading -> Preloader()
-            is PeopleState.Content -> MainState(
+            is PeopleUiState.Loading -> Preloader()
+            is PeopleUiState.Content -> MainState(
                 state = state,
-                onEvent = onEvent
+                onUserClick = { onEvent(PeopleEvent.Ui.OnUserClick(it)) },
+                onSearch = { onEvent(PeopleEvent.Ui.OnSearchRequest(it)) }
             )
 
-            PeopleState.Error -> UserListErrorScreen()
+            PeopleUiState.Error -> UserListErrorScreen()
         }
     }
 }
 
 @Composable
-private fun MainState(state: PeopleState.Content, onEvent: (PeopleEvent) -> Unit) {
+private fun MainState(
+    state: PeopleUiState.Content,
+    onSearch: (String) -> Unit,
+    onUserClick: (Long) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
         SearchBar(
             placeHolderString = "Users...",
-            onClick = { onEvent.invoke(PeopleEvent.FilterData(it)) }
+            onClick = onSearch
         )
-        UsersList(state::data, onEvent)
+        UsersList(data = state::data, onUserClick = onUserClick)
     }
 }
 
@@ -75,7 +81,7 @@ private fun MainState(state: PeopleState.Content, onEvent: (PeopleEvent) -> Unit
 private fun ScreenLoadingPreview() {
     AndroidzulipchatappTheme {
         PeopleScreen(
-            state = PeopleState.Loading,
+            state = PeopleUiState.Loading,
             onEvent = {}
         )
     }
@@ -94,7 +100,7 @@ private fun ScreenContentPreview() {
             )
         }
         PeopleScreen(
-            state = PeopleState.Content(items),
+            state = PeopleUiState.Content(items),
             onEvent = {}
         )
     }

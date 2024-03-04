@@ -1,67 +1,54 @@
 package com.android.zulip.chat.app.ui.people
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.android.zulip.chat.app.domain.people.PeopleAction
+import com.android.zulip.chat.app.domain.people.PeopleEvent
+import com.android.zulip.chat.app.domain.people.PeopleState
+import com.android.zulip.chat.app.domain.people.PeopleStateController
 import com.android.zulip.chat.app.domain.repo.UserRepo
+import com.android.zulip.chat.app.ui.base.BaseViewModel
 import com.android.zulip.chat.app.ui.main.navigation.NavState
 import com.android.zulip.chat.app.ui.main.navigation.Navigator
 import com.android.zulip.chat.app.utils.runSuspendCatching
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 class PeopleViewModel @AssistedInject constructor(
+    private val stateController: PeopleStateController,
+    private val peopleUiMapper: PeopleUiMapper,
     private val userRepo: UserRepo,
     private val navigator: Navigator
-) : ViewModel() {
+) : BaseViewModel<PeopleState, PeopleAction, PeopleEvent, PeopleUiState>(
+    stateController = stateController,
+    baseUiMapper = peopleUiMapper,
+    initEvent = PeopleEvent.Internal.OnInit
+) {
 
-    private val _state = MutableStateFlow<PeopleState>(PeopleState.Loading)
-    val state: StateFlow<PeopleState> = _state
-
-    init {
-        getAllUsers()
+    override fun obtainEvent(event: PeopleEvent) {
+        stateController.sendEvent(event)
     }
 
-    fun obtainEvent(event: PeopleEvent) {
-        when (event) {
-            is PeopleEvent.FilterData -> searchByFilter(event.text)
-            is PeopleEvent.NavigateToUser -> navigate(event.userId)
+    override suspend fun handleAction(action: PeopleAction) {
+        when (action) {
+            is PeopleAction.Internal.LoadUsers -> getAllUsers()
+            is PeopleAction.Internal.FilterUsers -> searchByFilter(action.query)
+            is PeopleAction.Internal.OpenUser -> navigator.navigate(NavState.ProfileNav(action.id))
         }
     }
 
-    private fun getAllUsers() {
-        viewModelScope.launch {
-            runSuspendCatching(
-                action = { userRepo.getAllUsers() },
-                onSuccess = { data -> _state.value = PeopleState.Content(data) },
-                onError = { _state.value = PeopleState.Error }
-            )
-        }
+    private suspend fun getAllUsers() {
+        runSuspendCatching(
+            action = { userRepo.getAllUsers() },
+            onSuccess = { stateController.sendEvent(PeopleEvent.Internal.OnLoadUsersResult(it)) },
+            onError = { stateController.sendEvent(PeopleEvent.Internal.OnError) }
+        )
     }
 
-    private fun searchByFilter(searchText: String) {
-        when (val state = _state.value) {
-            is PeopleState.Content -> {
-                viewModelScope.launch {
-                    runSuspendCatching(
-                        action = { userRepo.getUsersByNameLike(searchText) },
-                        onSuccess = { data -> _state.value = state.copy(data = data) },
-                        onError = { _state.value = PeopleState.Error }
-                    )
-                }
-            }
-
-            is PeopleState.Loading -> {}
-            PeopleState.Error -> {}
-        }
-    }
-
-    private fun navigate(userId: Long) {
-        viewModelScope.launch {
-            navigator.navigate(NavState.ProfileNav(userId))
-        }
+    private suspend fun searchByFilter(searchText: String) {
+        runSuspendCatching(
+            action = { userRepo.getUsersByNameLike(searchText) },
+            onSuccess = { stateController.sendEvent(PeopleEvent.Internal.OnLoadUsersResult(it)) },
+            onError = { stateController.sendEvent(PeopleEvent.Internal.OnError) }
+        )
     }
 
     @AssistedFactory

@@ -15,19 +15,26 @@ class ChannelsRepoImpl @Inject constructor(
     override suspend fun getAllStreams(): List<StreamInfo> {
 
         //todo Fix
-        val subscribedStreamsIdList =
-            zulipApi.getSubscribedStreams().subscriptions.map { it.streamId }
-        zulipApi.getAllStreams().streams.map { stream ->
-            val streamEntity = stream.toEntity(stream.streamId in subscribedStreamsIdList)
-            zulipApi.getStreamTopics(stream.streamId).topics.map { topic ->
-                topic.toEntity(stream.streamId)
-            }.apply {
-                streamDao.insertStreamWithTopicList(
-                    stream = streamEntity,
-                    topicsList = this
-                )
+        try {
+            val subscribedStreamsIdList =
+                zulipApi.getSubscribedStreams().subscriptions.map { it.streamId }
+            zulipApi.getAllStreams().streams.map { stream ->
+                val streamEntity = stream.toEntity(stream.streamId in subscribedStreamsIdList)
+                zulipApi.getStreamTopics(stream.streamId).topics.map { topic ->
+                    topic.toEntity(stream.streamId)
+                }.apply {
+                    streamDao.insertStreamWithTopicList(
+                        stream = streamEntity,
+                        topicsList = this
+                    )
+                }
             }
+        } catch (e: Exception){
+
+            println(e)
+            println("Socket timeout")
         }
+
 
         return streamDao.getAllStreamsWithTopics().map { it.toEntity() }
 

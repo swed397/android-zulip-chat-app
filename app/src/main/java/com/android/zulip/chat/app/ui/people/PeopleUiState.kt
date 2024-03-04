@@ -2,10 +2,10 @@ package com.android.zulip.chat.app.ui.people
 
 import com.android.zulip.chat.app.domain.model.UserModel
 
-sealed interface PeopleState {
-    object Loading : PeopleState
+sealed interface PeopleUiState {
+    object Loading : PeopleUiState
     data class Content(
         val data: List<UserModel>,
-    ) : PeopleState
-    object Error: PeopleState
+    ) : PeopleUiState
+    object Error: PeopleUiState
 }

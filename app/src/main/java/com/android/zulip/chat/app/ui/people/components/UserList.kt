@@ -20,10 +20,10 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.domain.model.UserModel
-import com.android.zulip.chat.app.ui.people.PeopleEvent
+import com.android.zulip.chat.app.domain.people.PeopleEvent
 
 @Composable
-fun UsersList(data: () -> List<UserModel>, onEvent: (PeopleEvent) -> Unit) {
+fun UsersList(data: () -> List<UserModel>, onUserClick: (Long) -> Unit) {
     LazyColumn {
         items(data.invoke()) { item ->
             UserListItem(
@@ -31,7 +31,7 @@ fun UsersList(data: () -> List<UserModel>, onEvent: (PeopleEvent) -> Unit) {
                 name = item.name,
                 email = item.email ?: "No email",
                 avatarUrls = item.avatarUrl,
-                onEvent = onEvent
+                onUserClick = onUserClick
             )
         }
     }
@@ -44,7 +44,7 @@ private fun UserListItem(
     name: String,
     email: String,
     avatarUrls: String?,
-    onEvent: (PeopleEvent) -> Unit
+    onUserClick: (Long) -> Unit
 ) {
     ListItem(
         headlineText = { Text(text = name) },
@@ -64,7 +64,7 @@ private fun UserListItem(
                         .clip(RoundedCornerShape(percent = 50))
                 )
         },
-        modifier = Modifier.clickable { onEvent.invoke(PeopleEvent.NavigateToUser(userId)) }
+        modifier = Modifier.clickable { onUserClick.invoke(userId) }
     )
     Divider(color = Color.Gray, thickness = 1.dp)
 }
@@ -72,5 +72,10 @@ private fun UserListItem(
 @Composable
 @Preview(showBackground = true)
 private fun UserListPreview() {
-    UserListItem(userId = 1, name = "Test", email = "test@mail.ru", avatarUrls = "", onEvent = {})
+    UserListItem(
+        userId = 1,
+        name = "Test",
+        email = "test@mail.ru",
+        avatarUrls = "",
+        onUserClick = {})
 }
