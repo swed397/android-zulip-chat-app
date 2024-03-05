@@ -13,7 +13,6 @@ import com.android.zulip.chat.app.utils.runSuspendCatching
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ProfileViewModel @AssistedInject constructor(
