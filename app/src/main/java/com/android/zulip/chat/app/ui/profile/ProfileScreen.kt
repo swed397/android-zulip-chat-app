@@ -36,7 +36,7 @@ fun ProfileScreenHolder(userId: Long?) {
 }
 
 @Composable
-private fun ProfileScreen(state: ProfileState) {
+private fun ProfileScreen(state: ProfileUiState) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -44,9 +44,9 @@ private fun ProfileScreen(state: ProfileState) {
             .background(Color.Magenta)
     ) {
         when (state) {
-            is ProfileState.Loading -> Preloader()
-            is ProfileState.Content -> MainState(user = state.userModel)
-            is ProfileState.Error -> ProfileErrorScreen()
+            is ProfileUiState.Loading -> Preloader()
+            is ProfileUiState.Content -> MainState(user = state.userModel)
+            is ProfileUiState.Error -> ProfileErrorScreen()
         }
     }
 }
@@ -68,7 +68,7 @@ private fun MainState(user: ProfileUiModel) {
 private fun PreviewProfileScreen() {
     AndroidzulipchatappTheme {
         ProfileScreen(
-            state = ProfileState.Content(
+            state = ProfileUiState.Content(
                 ProfileUiModel(
                     id = 1L,
                     name = "Test Name",

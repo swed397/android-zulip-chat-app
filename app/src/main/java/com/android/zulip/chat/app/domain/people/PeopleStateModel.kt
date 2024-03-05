@@ -1,8 +1,11 @@
 package com.android.zulip.chat.app.domain.people
 
+import com.android.zulip.chat.app.domain.base.Action
+import com.android.zulip.chat.app.domain.base.Event
+import com.android.zulip.chat.app.domain.base.State
 import com.android.zulip.chat.app.domain.model.UserModel
 
-sealed interface PeopleState {
+sealed interface PeopleState : State {
     object Loading : PeopleState
 
     data class Content(
@@ -12,7 +15,7 @@ sealed interface PeopleState {
     object Error : PeopleState
 }
 
-sealed interface PeopleEvent {
+sealed interface PeopleEvent : Event {
     sealed interface Ui : PeopleEvent {
 
         @JvmInline
@@ -32,7 +35,7 @@ sealed interface PeopleEvent {
     }
 }
 
-sealed interface PeopleAction {
+sealed interface PeopleAction : Action {
     sealed interface Internal : PeopleAction {
         object LoadUsers : Internal
 

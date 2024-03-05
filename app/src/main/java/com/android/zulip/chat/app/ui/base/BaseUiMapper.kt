@@ -1,6 +1,8 @@
 package com.android.zulip.chat.app.ui.base
 
-abstract class BaseUiMapper<T, S> {
+import com.android.zulip.chat.app.domain.base.State
 
-    abstract operator fun invoke(state: T): S
+abstract class BaseUiMapper<S : State, U : UiState> {
+
+    abstract operator fun invoke(state: S): U
 }

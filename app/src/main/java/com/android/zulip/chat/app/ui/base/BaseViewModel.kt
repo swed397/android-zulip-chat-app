@@ -2,7 +2,10 @@ package com.android.zulip.chat.app.ui.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.zulip.chat.app.domain.base.Action
 import com.android.zulip.chat.app.domain.base.BaseStateController
+import com.android.zulip.chat.app.domain.base.Event
+import com.android.zulip.chat.app.domain.base.State
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -11,13 +14,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-abstract class BaseViewModel<T, S, U, V>(
-    stateController: BaseStateController<T, S, U>,
-    private val baseUiMapper: BaseUiMapper<T, V>,
-    initEvent: U
+abstract class BaseViewModel<S : State, A : Action, E : Event, U : UiState>(
+    private val stateController: BaseStateController<S, A, E>,
+    private val baseUiMapper: BaseUiMapper<S, U>,
+    initEvent: E
 ) : ViewModel() {
 
-    val state: StateFlow<V> = stateController.state
+    val state: StateFlow<U> = stateController.state
         .map { baseUiMapper(it) }
         .stateIn(
             scope = viewModelScope,
@@ -39,7 +42,9 @@ abstract class BaseViewModel<T, S, U, V>(
         stateController.sendEvent(initEvent)
     }
 
-    abstract fun obtainEvent(event: U)
+    fun obtainEvent(event: E) {
+        stateController.sendEvent(event)
+    }
 
-    abstract suspend fun handleAction(action: S)
+    abstract suspend fun handleAction(action: A)
 }

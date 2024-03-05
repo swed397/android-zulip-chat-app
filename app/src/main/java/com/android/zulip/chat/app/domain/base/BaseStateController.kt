@@ -10,18 +10,18 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.io.Closeable
 
-abstract class BaseStateController<T, S, U>(
-    val initialState: T,
+abstract class BaseStateController<S : State, A : Action, E : Event>(
+    val initialState: S,
     protected val stateControllerCoroutineScope: CoroutineScope
 ) : Closeable {
 
-    protected val _state: MutableStateFlow<T> = MutableStateFlow(initialState)
-    val state: Flow<T> = _state
+    protected val _state: MutableStateFlow<S> = MutableStateFlow(initialState)
+    val state: Flow<S> = _state
 
-    protected val _actions: MutableSharedFlow<S> = MutableSharedFlow(extraBufferCapacity = 10)
-    val actions: Flow<S> = _actions
+    protected val _actions: MutableSharedFlow<A> = MutableSharedFlow(extraBufferCapacity = 10)
+    val actions: Flow<A> = _actions
 
-    private val _event: MutableSharedFlow<U> = MutableSharedFlow(extraBufferCapacity = 10)
+    private val _event: MutableSharedFlow<E> = MutableSharedFlow(extraBufferCapacity = 10)
 
 
     init {
@@ -29,13 +29,13 @@ abstract class BaseStateController<T, S, U>(
             .launchIn(stateControllerCoroutineScope)
     }
 
-    fun sendEvent(event: U) {
+    fun sendEvent(event: E) {
         stateControllerCoroutineScope.launch {
             _event.emit(event)
         }
     }
 
-    abstract fun handleEvent(event: U)
+    abstract fun handleEvent(event: E)
 
     final override fun close() {
         stateControllerCoroutineScope.coroutineContext.cancel()

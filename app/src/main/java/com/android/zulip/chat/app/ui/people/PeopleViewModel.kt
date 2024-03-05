@@ -14,18 +14,14 @@ import dagger.assisted.AssistedInject
 
 class PeopleViewModel @AssistedInject constructor(
     private val stateController: PeopleStateController,
-    peopleUiMapper: PeopleUiMapper,
+    peopleStateUiMapper: PeopleStateUiMapper,
     private val userRepo: UserRepo,
     private val navigator: Navigator
 ) : BaseViewModel<PeopleState, PeopleAction, PeopleEvent, PeopleUiState>(
     stateController = stateController,
-    baseUiMapper = peopleUiMapper,
+    baseUiMapper = peopleStateUiMapper,
     initEvent = PeopleEvent.Internal.OnInit
 ) {
-
-    override fun obtainEvent(event: PeopleEvent) {
-        stateController.sendEvent(event)
-    }
 
     override suspend fun handleAction(action: PeopleAction) {
         when (action) {
