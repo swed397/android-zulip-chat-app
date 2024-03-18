@@ -1,7 +1,6 @@
 package com.android.zulip.chat.app.ui.chanels
 
 import com.android.zulip.chat.app.domain.channels.ChannelsState
-import com.android.zulip.chat.app.domain.profile.ProfileState
 import com.android.zulip.chat.app.ui.base.BaseUiMapper
 import javax.inject.Inject
 

@@ -32,23 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.domain.channels.ChannelsEvent
+import com.android.zulip.chat.app.domain.channels.StreamType
 import com.android.zulip.chat.app.ui.chanels.ChannelsUiState
 import com.android.zulip.chat.app.ui.chanels.PreviewStateProvider
-import com.android.zulip.chat.app.domain.channels.StreamType
 import com.android.zulip.chat.app.ui.chanels.StreamUiModel
 
 @Composable
 fun StreamList(state: ChannelsUiState.Content, onEvent: (ChannelsEvent.Ui) -> Unit) {
-    LazyColumn {
-        items(items = state.data, key = { it.id }) {
-            StreamListItem(it, onEvent)
-            Divider(color = Color.Gray, thickness = 1.dp)
-        }
-    }
-}
-
-@Composable
-private fun StreamsList(state: ChannelsUiState.Content, onEvent: (ChannelsEvent.Ui) -> Unit) {
     LazyColumn {
         items(items = state.data, key = { it.id }) {
             StreamListItem(it, onEvent)
