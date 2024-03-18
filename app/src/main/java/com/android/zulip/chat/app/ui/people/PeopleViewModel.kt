@@ -5,7 +5,7 @@ import com.android.zulip.chat.app.domain.people.PeopleEvent
 import com.android.zulip.chat.app.domain.people.PeopleState
 import com.android.zulip.chat.app.domain.people.PeopleStateController
 import com.android.zulip.chat.app.domain.repo.UserRepo
-import com.android.zulip.chat.app.ui.base.BaseViewModel
+import com.android.zulip.chat.app.ui.base.BaseViewModelWithStateController
 import com.android.zulip.chat.app.ui.main.navigation.NavState
 import com.android.zulip.chat.app.ui.main.navigation.Navigator
 import com.android.zulip.chat.app.utils.runSuspendCatching
@@ -17,7 +17,7 @@ class PeopleViewModel @AssistedInject constructor(
     peopleStateUiMapper: PeopleStateUiMapper,
     private val userRepo: UserRepo,
     private val navigator: Navigator
-) : BaseViewModel<PeopleState, PeopleAction, PeopleEvent, PeopleUiState>(
+) : BaseViewModelWithStateController<PeopleState, PeopleAction, PeopleEvent, PeopleUiState>(
     stateController = stateController,
     baseUiMapper = peopleStateUiMapper,
     initEvent = PeopleEvent.Internal.OnInit

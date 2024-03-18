@@ -6,7 +6,7 @@ import com.android.zulip.chat.app.domain.profile.ProfileEvent
 import com.android.zulip.chat.app.domain.profile.ProfileState
 import com.android.zulip.chat.app.domain.profile.ProfileStateController
 import com.android.zulip.chat.app.domain.repo.UserRepo
-import com.android.zulip.chat.app.ui.base.BaseViewModel
+import com.android.zulip.chat.app.ui.base.BaseViewModelWithStateController
 import com.android.zulip.chat.app.ui.main.navigation.NavState
 import com.android.zulip.chat.app.ui.main.navigation.Navigator
 import com.android.zulip.chat.app.utils.runSuspendCatching
@@ -21,7 +21,7 @@ class ProfileViewModel @AssistedInject constructor(
     private val navigator: Navigator,
     profileStateUiMapper: ProfileStateUiMapper,
     @Assisted userId: Long
-) : BaseViewModel<ProfileState, ProfileAction, ProfileEvent, ProfileUiState>(
+) : BaseViewModelWithStateController<ProfileState, ProfileAction, ProfileEvent, ProfileUiState>(
     stateController = stateController,
     baseUiMapper = profileStateUiMapper,
     initEvent = ProfileEvent.Internal.OnInit(userId)
@@ -31,7 +31,6 @@ class ProfileViewModel @AssistedInject constructor(
         when (action) {
             is ProfileAction.Internal.LoadUser -> getUserById(action.id)
 
-            //ToDo add in future
             is ProfileAction.Internal.OnNavigateBack -> navigator.navigate(NavState.PeoplesNav)
         }
     }

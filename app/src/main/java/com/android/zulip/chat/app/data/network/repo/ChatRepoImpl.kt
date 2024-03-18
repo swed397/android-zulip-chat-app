@@ -12,7 +12,9 @@ import com.android.zulip.chat.app.domain.repo.ChatRepo
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.net.UnknownHostException
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 class ChatRepoImpl @Inject constructor(
     private val zulipApi: ZulipApi,
@@ -23,21 +25,27 @@ class ChatRepoImpl @Inject constructor(
         streamName: String,
         topicName: String
     ): List<MessageModel> {
-        zulipApi.getAllMessages(
-            narrow = Gson().toJson(
-                listOf(
-                    Narrow(
-                        operator = NarrowType.STREAM_OPERATOR.stringValue,
-                        operand = streamName
-                    ),
-                    Narrow(
-                        operator = NarrowType.TOPIC_OPERATOR.stringValue,
-                        operand = topicName
+        try {
+            zulipApi.getAllMessages(
+                narrow = Gson().toJson(
+                    listOf(
+                        Narrow(
+                            operator = NarrowType.STREAM_OPERATOR.stringValue,
+                            operand = streamName
+                        ),
+                        Narrow(
+                            operator = NarrowType.TOPIC_OPERATOR.stringValue,
+                            operand = topicName
+                        )
                     )
                 )
-            )
-        ).messages.map { it.toEntity(streamName, topicName) }
-            .apply { chatDao.insertAllMessages(this) }
+            ).messages.map { it.toEntity(streamName, topicName) }
+                .apply { chatDao.insertAllMessages(this) }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: UnknownHostException) {
+
+        }
 
         return chatDao.getAllMessagesByStreamNameAndTopicName(
             streamName = streamName,

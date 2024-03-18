@@ -1,5 +1,6 @@
 package com.android.zulip.chat.app.utils
 
+import android.util.Log
 import kotlin.coroutines.cancellation.CancellationException
 
 suspend fun <R> runSuspendCatching(
@@ -13,6 +14,7 @@ suspend fun <R> runSuspendCatching(
             if (it is CancellationException) {
                 throw it
             } else {
+                Log.println(Log.ERROR, "EXC", it.message ?: "Oops")
                 onError.invoke()
             }
         }

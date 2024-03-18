@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-abstract class BaseViewModel<S : State, A : Action, E : Event, U : UiState>(
+abstract class BaseViewModelWithStateController<S : State, A : Action, E : Event, U : UiState>(
     private val stateController: BaseStateController<S, A, E>,
     private val baseUiMapper: BaseUiMapper<S, U>,
     initEvent: E

@@ -5,12 +5,15 @@ import javax.inject.Inject
 
 class ChannelUiMapper @Inject constructor() {
 
-    operator fun invoke(streamInfo: List<StreamInfo>): List<StreamUiModel> = streamInfo.map {
+    operator fun invoke(
+        streamInfo: List<StreamInfo>,
+        openedStreams: List<Long>
+    ): List<StreamUiModel> = streamInfo.map {
         StreamUiModel(
             id = it.id,
             name = it.name,
             topicsList = it.topicsList,
-            isOpened = false
+            isOpened = it.id in openedStreams
         )
     }
 }

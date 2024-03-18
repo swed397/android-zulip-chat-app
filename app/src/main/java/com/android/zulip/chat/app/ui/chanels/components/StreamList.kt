@@ -31,14 +31,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.zulip.chat.app.R
-import com.android.zulip.chat.app.ui.chanels.ChannelsEvent
-import com.android.zulip.chat.app.ui.chanels.ChannelsState
+import com.android.zulip.chat.app.domain.channels.ChannelsEvent
+import com.android.zulip.chat.app.ui.chanels.ChannelsUiState
 import com.android.zulip.chat.app.ui.chanels.PreviewStateProvider
-import com.android.zulip.chat.app.ui.chanels.StreamType
+import com.android.zulip.chat.app.domain.channels.StreamType
 import com.android.zulip.chat.app.ui.chanels.StreamUiModel
 
 @Composable
-fun StreamList(state: ChannelsState.Content, onEvent: (ChannelsEvent) -> Unit) {
+fun StreamList(state: ChannelsUiState.Content, onEvent: (ChannelsEvent.Ui) -> Unit) {
     LazyColumn {
         items(items = state.data, key = { it.id }) {
             StreamListItem(it, onEvent)
@@ -48,7 +48,7 @@ fun StreamList(state: ChannelsState.Content, onEvent: (ChannelsEvent) -> Unit) {
 }
 
 @Composable
-private fun StreamsList(state: ChannelsState.Content, onEvent: (ChannelsEvent) -> Unit) {
+private fun StreamsList(state: ChannelsUiState.Content, onEvent: (ChannelsEvent.Ui) -> Unit) {
     LazyColumn {
         items(items = state.data, key = { it.id }) {
             StreamListItem(it, onEvent)
@@ -58,7 +58,7 @@ private fun StreamsList(state: ChannelsState.Content, onEvent: (ChannelsEvent) -
 }
 
 @Composable
-private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Unit) {
+private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent.Ui) -> Unit) {
     Column(
         modifier = Modifier.animateContentSize()
     ) {
@@ -71,7 +71,7 @@ private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Un
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
-                    onEvent.invoke(ChannelsEvent.OpenStream(stream.id))
+                    onEvent.invoke(ChannelsEvent.Ui.OpenStream(streamId = stream.id))
                 }
         ) {
             Text(
@@ -97,7 +97,7 @@ private fun StreamListItem(stream: StreamUiModel, onEvent: (ChannelsEvent) -> Un
                         .background(Color.Yellow)
                         .clickable {
                             onEvent.invoke(
-                                ChannelsEvent.NavigateToChat(
+                                ChannelsEvent.Ui.OpenStreamChat(
                                     streamName = stream.name,
                                     topicName = it.name
                                 )
@@ -153,7 +153,7 @@ private fun StreamListPreview() {
         )
     )
 
-    val content = ChannelsState.Content(
+    val content = ChannelsUiState.Content(
         data = items,
         streamType = StreamType.SUBSCRIBED
     )

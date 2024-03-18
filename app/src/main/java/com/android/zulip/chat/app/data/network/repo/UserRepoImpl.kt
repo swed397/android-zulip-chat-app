@@ -7,6 +7,7 @@ import com.android.zulip.chat.app.domain.mapper.toEntity
 import com.android.zulip.chat.app.domain.model.CurrentUserModel
 import com.android.zulip.chat.app.domain.model.UserModel
 import com.android.zulip.chat.app.domain.repo.UserRepo
+import java.net.UnknownHostException
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -22,8 +23,8 @@ class UserRepoImpl @Inject constructor(
             }
         } catch (e: CancellationException) {
             throw e
-        } catch (e: RuntimeException) {
-            println(e)
+        } catch (_: UnknownHostException) {
+
         }
 
         return userDao.getAllUsers().map { it.toEntity() }

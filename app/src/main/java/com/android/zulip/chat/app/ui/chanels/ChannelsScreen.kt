@@ -17,6 +17,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.data.network.model.TopicInfo
 import com.android.zulip.chat.app.di.injectedViewModel
+import com.android.zulip.chat.app.domain.channels.ChannelsEvent
+import com.android.zulip.chat.app.domain.channels.StreamType
 import com.android.zulip.chat.app.ui.Preloader
 import com.android.zulip.chat.app.ui.SearchBar
 import com.android.zulip.chat.app.ui.chanels.components.StreamList
@@ -36,7 +38,7 @@ fun ChannelsScreenHolder() {
 }
 
 @Composable
-private fun ChannelsScreen(state: ChannelsState, onEvent: (ChannelsEvent) -> Unit) {
+private fun ChannelsScreen(state: ChannelsUiState, onEvent: (ChannelsEvent.Ui) -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -44,21 +46,21 @@ private fun ChannelsScreen(state: ChannelsState, onEvent: (ChannelsEvent) -> Uni
             .background(Color.Blue)
     ) {
         when (state) {
-            is ChannelsState.Loading -> {
+            is ChannelsUiState.Loading -> {
                 Preloader()
             }
 
-            is ChannelsState.Content -> {
+            is ChannelsUiState.Content -> {
                 ChanelTabs(state = state, onEvent = onEvent)
             }
 
-            ChannelsState.Error -> StreamListErrorScreen()
+            ChannelsUiState.Error -> StreamListErrorScreen()
         }
     }
 }
 
 @Composable
-private fun ChanelTabs(state: ChannelsState.Content, onEvent: (ChannelsEvent) -> Unit) {
+private fun ChanelTabs(state: ChannelsUiState.Content, onEvent: (ChannelsEvent.Ui) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -66,7 +68,7 @@ private fun ChanelTabs(state: ChannelsState.Content, onEvent: (ChannelsEvent) ->
     ) {
         SearchBar(
             placeHolderString = "Search...",
-            onClick = { onEvent.invoke(ChannelsEvent.FilterData(it)) })
+            onClick = { onEvent.invoke(ChannelsEvent.Ui.Filter(it)) })
 
         StreamTabs(state = state, onEvent = onEvent)
         StreamList(state = state, onEvent = onEvent)
@@ -76,7 +78,7 @@ private fun ChanelTabs(state: ChannelsState.Content, onEvent: (ChannelsEvent) ->
 @Composable
 @Preview
 fun ChannelPreview(
-    @PreviewParameter(PreviewStateProvider::class) state: ChannelsState
+    @PreviewParameter(PreviewStateProvider::class) state: ChannelsUiState
 ) {
     Column(
         modifier = Modifier
@@ -90,11 +92,11 @@ fun ChannelPreview(
     }
 }
 
-class PreviewStateProvider : PreviewParameterProvider<ChannelsState> {
+class PreviewStateProvider : PreviewParameterProvider<ChannelsUiState> {
 
-    override val values: Sequence<ChannelsState>
+    override val values: Sequence<ChannelsUiState>
         get() = sequenceOf(
-            ChannelsState.Loading,
+            ChannelsUiState.Loading,
             content
         )
 
@@ -119,7 +121,7 @@ class PreviewStateProvider : PreviewParameterProvider<ChannelsState> {
             )
         )
 
-        val content = ChannelsState.Content(
+        val content = ChannelsUiState.Content(
             data = items,
             streamType = StreamType.SUBSCRIBED
         )
