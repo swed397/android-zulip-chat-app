@@ -2,7 +2,6 @@ package com.android.zulip.chat.app.ui.chat
 
 import com.android.zulip.chat.app.domain.model.MessageModel
 import com.android.zulip.chat.app.utils.OWN_USER_ID
-import com.android.zulip.chat.app.utils.toEmojiCode
 import com.android.zulip.chat.app.utils.toEmojiString
 import java.time.LocalDateTime
 import javax.inject.Inject

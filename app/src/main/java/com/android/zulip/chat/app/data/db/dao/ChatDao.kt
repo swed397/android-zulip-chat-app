@@ -8,9 +8,6 @@ import androidx.room.Transaction
 import com.android.zulip.chat.app.data.db.entity.MessageEntity
 import com.android.zulip.chat.app.data.db.entity.MessagesWithReactions
 import com.android.zulip.chat.app.data.db.entity.ReactionEntity
-import com.android.zulip.chat.app.data.db.entity.StreamEntity
-import com.android.zulip.chat.app.data.db.entity.StreamWithTopicsEntity
-import com.android.zulip.chat.app.data.db.entity.TopicEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
