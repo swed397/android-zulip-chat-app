@@ -9,4 +9,5 @@ data class MessageModel(
     val userFullName: String,
     val messageTimestamp: LocalDateTime,
     val avatarUrl: String,
+    val reactions: List<String>
 )

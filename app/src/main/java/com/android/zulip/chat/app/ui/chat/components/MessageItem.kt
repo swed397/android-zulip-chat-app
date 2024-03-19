@@ -36,6 +36,9 @@ fun MessageItem(message: MessageUiModel) {
             CircleIcon(avatarUrl = message.avatarUrl, onClickableImage = {})
         }
         MessageContentItem(message = message)
+        message.reactions.forEach {
+            Text(text = it)
+        }
     }
 }
 
@@ -98,7 +101,8 @@ private fun MessageItemPreview() {
         userFullName = "Test Test",
         messageTimestamp = LocalDateTime.now(),
         avatarUrl = "",
-        ownMessage = false
+        ownMessage = false,
+        reactions = listOf()
     )
     val ownMessageItem = MessageUiModel(
         messageId = 1,
@@ -107,7 +111,8 @@ private fun MessageItemPreview() {
         userFullName = "Test Test",
         messageTimestamp = LocalDateTime.now(),
         avatarUrl = "",
-        ownMessage = true
+        ownMessage = true,
+        reactions = listOf()
     )
     Column {
         MessageItem(message = item)

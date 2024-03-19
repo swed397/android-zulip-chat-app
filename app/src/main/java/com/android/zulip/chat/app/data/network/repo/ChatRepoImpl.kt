@@ -39,18 +39,24 @@ class ChatRepoImpl @Inject constructor(
                         )
                     )
                 )
-            ).messages.map { it.toEntity(streamName, topicName) }
-                .apply { chatDao.insertAllMessages(this) }
+            ).messages
+                .map { it.toEntity(streamName, topicName) }
+                .forEach {
+                    chatDao.insertMessagesWithReactionsList(
+                        message = it.first,
+                        reactionsList = it.second
+                    )
+                }
         } catch (e: CancellationException) {
             throw e
         } catch (_: UnknownHostException) {
 
         }
 
-        return chatDao.getAllMessagesByStreamNameAndTopicName(
+        return chatDao.getAllMessagesWithReactions(
             streamName = streamName,
             topicName = topicName
-        ).map { it.toDto() }
+        ).map { it.messageEntity.toDto(it.reactionsList) }
     }
 
     override fun subscribeOnMessagesFlow(
@@ -60,7 +66,8 @@ class ChatRepoImpl @Inject constructor(
         chatDao.getAllMessagesByStreamNameAndTopicNameByFlow(
             streamName = streamName,
             topicName = topicName
-        ).map { it.map { messageEntity -> messageEntity.toDto() } }
+            //todo fix
+        ).map { it.map { messageEntity -> messageEntity.toDto(listOf()) } }
 
     override suspend fun sendMessage(
         streamName: String,

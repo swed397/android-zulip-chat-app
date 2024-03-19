@@ -10,10 +10,7 @@ interface ChatRepo {
         topicName: String
     ): List<MessageModel>
 
-    fun subscribeOnMessagesFlow(
-        streamName: String,
-        topicName: String
-    ): Flow<List<MessageModel>>
+    fun subscribeOnMessagesFlow(streamName: String, topicName: String): Flow<List<MessageModel>>
 
     suspend fun sendMessage(
         streamName: String,

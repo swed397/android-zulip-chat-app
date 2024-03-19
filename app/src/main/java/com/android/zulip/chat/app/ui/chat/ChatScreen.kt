@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.android.zulip.chat.app.App
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.di.injectedViewModel
+import com.android.zulip.chat.app.domain.chat.ChatEvents
 import com.android.zulip.chat.app.ui.Preloader
 import com.android.zulip.chat.app.ui.chat.components.ChatAppBar
 import com.android.zulip.chat.app.ui.chat.components.ChatBottomBar
@@ -68,8 +69,8 @@ fun ChatScreenHolder(streamName: String, topicName: String) {
 private fun ChatScreen(
     streamName: String,
     topicName: String,
-    state: ChatState,
-    onEvent: (chatEvent: ChatEvent) -> Unit
+    state: ChatUiState,
+    onEvent: (chatEvent: ChatEvents.Ui) -> Unit
 ) {
     Scaffold(
         topBar = { ChatAppBar(streamName = streamName, topicName = topicName) },
@@ -87,8 +88,9 @@ private fun ChatScreen(
             ) {
 
                 when (state) {
-                    is ChatState.Content -> MessagesList(messages = state.messagesData)
-                    is ChatState.Loading -> Preloader()
+                    is ChatUiState.Content -> MessagesList(messages = state.messagesData)
+                    is ChatUiState.Loading -> Preloader()
+                    is ChatUiState.Error -> {}
                 }
             }
         }
@@ -190,7 +192,8 @@ private fun ChatScreenPreview() {
             userFullName = "Test Test",
             messageTimestamp = LocalDateTime.now(),
             avatarUrl = "",
-            ownMessage = false
+            ownMessage = false,
+            reactions = listOf()
         ),
         MessageUiModel(
             messageId = 2,
@@ -199,7 +202,8 @@ private fun ChatScreenPreview() {
             userFullName = "Test2 Test2",
             messageTimestamp = LocalDateTime.now(),
             avatarUrl = "",
-            ownMessage = true
+            ownMessage = true,
+            reactions = listOf()
         ),
         MessageUiModel(
             messageId = 3,
@@ -208,14 +212,15 @@ private fun ChatScreenPreview() {
             userFullName = "Test3 Test3",
             messageTimestamp = LocalDateTime.now(),
             avatarUrl = "",
-            ownMessage = false
+            ownMessage = false,
+            reactions = listOf()
         )
     )
 
     ChatScreen(
         streamName = "Stream name",
         topicName = "test",
-        state = ChatState.Content(messagesData = data),
+        state = ChatUiState.Content(messagesData = data),
         onEvent = {}
     )
 }

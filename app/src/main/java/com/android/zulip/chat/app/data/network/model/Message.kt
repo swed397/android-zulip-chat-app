@@ -25,8 +25,23 @@ data class Message(
     @SerializedName("content")
     val content: String,
 
+    @SerializedName("reactions")
+    val reactionsList: List<ReactionRs>,
+
 //    @SerializedName("timestamp")
 //    val timestamp: LocalDateTime
+)
+
+data class ReactionRs(
+
+    @SerializedName("emoji_name")
+    val emojiName: String,
+
+    @SerializedName("emoji_code")
+    val emojiCode: String,
+
+    @SerializedName("user_id")
+    val userId: Long,
 )
 
 data class Narrow(

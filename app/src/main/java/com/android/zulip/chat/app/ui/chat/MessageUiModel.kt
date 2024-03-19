@@ -9,5 +9,6 @@ data class MessageUiModel(
     val userFullName: String,
     val messageTimestamp: LocalDateTime,
     val avatarUrl: String,
-    val ownMessage: Boolean
+    val ownMessage: Boolean,
+    val reactions: List<String>
 )

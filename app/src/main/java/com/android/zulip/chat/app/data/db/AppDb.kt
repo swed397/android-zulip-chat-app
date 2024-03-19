@@ -7,12 +7,14 @@ import com.android.zulip.chat.app.data.db.dao.EventDao
 import com.android.zulip.chat.app.data.db.dao.StreamDao
 import com.android.zulip.chat.app.data.db.dao.UserDao
 import com.android.zulip.chat.app.data.db.entity.MessageEntity
+import com.android.zulip.chat.app.data.db.entity.ReactionEntity
 import com.android.zulip.chat.app.data.db.entity.StreamEntity
 import com.android.zulip.chat.app.data.db.entity.TopicEntity
 import com.android.zulip.chat.app.data.db.entity.UserEntity
 
 @Database(
-    entities = [StreamEntity::class, TopicEntity::class, UserEntity::class, MessageEntity::class],
+    entities = [StreamEntity::class, TopicEntity::class, UserEntity::class, MessageEntity::class,
+        ReactionEntity::class],
     version = 1
 )
 abstract class AppDb : RoomDatabase() {

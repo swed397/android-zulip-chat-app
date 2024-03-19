@@ -1,8 +1,10 @@
 package com.android.zulip.chat.app.data.db.entity
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 
 @Entity(tableName = "message")
 data class MessageEntity(
@@ -13,4 +15,23 @@ data class MessageEntity(
     @ColumnInfo("content") val content: String,
     @ColumnInfo("stream_name") val streamName: String,
     @ColumnInfo("topic_name") val topicName: String
+)
+
+@Entity(tableName = "reactions")
+data class ReactionEntity(
+    @PrimaryKey @ColumnInfo("id") val id: Long? = null,
+    @ColumnInfo("message_id") val messageId: Long?,
+    @ColumnInfo("user_id") val userId: Long?,
+    @ColumnInfo("emoji_code") val emojiCode: String?,
+    @ColumnInfo("emoji_name") val emojiName: String?,
+)
+
+@Entity
+data class MessagesWithReactions(
+    @Embedded val messageEntity: MessageEntity,
+    @Relation(
+        parentColumn = "message_id",
+        entityColumn = "message_id"
+    )
+    val reactionsList: List<ReactionEntity>
 )
