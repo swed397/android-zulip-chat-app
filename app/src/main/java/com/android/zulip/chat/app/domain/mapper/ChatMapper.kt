@@ -39,7 +39,7 @@ fun MessageEntity.toDto(reactionsList: List<ReactionEntity>): MessageModel =
         messageTimestamp = LocalDateTime.now(),
         avatarUrl = avatarUrl,
         //ToDo fix
-        reactions = reactionsList.map { it.emojiCode!! }
+        reactions = reactionsList.map { it.emojiCode }
     )
 
 fun MessageEvent.toEntity(): MessageEntity =
