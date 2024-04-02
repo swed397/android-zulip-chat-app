@@ -31,6 +31,9 @@ data class Event(
     @SerializedName("emoji_code")
     val emojiCode: String,
 
+    @SerializedName("emoji_name")
+    val emojiName: String,
+
     @SerializedName("message")
     val message: MessageEvent,
 

@@ -4,15 +4,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -22,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.android.zulip.chat.app.ui.chat.MessageUiModel
+import com.android.zulip.chat.app.ui.chat.ReactionUiModel
 import java.time.LocalDateTime
 
 @Composable
@@ -36,9 +42,6 @@ fun MessageItem(message: MessageUiModel) {
             CircleIcon(avatarUrl = message.avatarUrl, onClickableImage = {})
         }
         MessageContentItem(message = message)
-        message.reactions.forEach {
-            Text(text = it)
-        }
     }
 }
 
@@ -59,17 +62,41 @@ private fun CircleIcon(
 
 @Composable
 private fun MessageContentItem(message: MessageUiModel) {
-    Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(10.dp))
-            .widthIn(max = 217.dp)
-            .background(Color.Black)
-            .padding(start = 10.dp, end = 8.dp, bottom = 5.dp)
+    Column(horizontalAlignment = if (message.ownMessage) Alignment.End else Alignment.Start) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .widthIn(max = 217.dp)
+                .background(Color.Black)
+                .padding(start = 10.dp, end = 8.dp, bottom = 5.dp)
 
-    ) {
-        SenderNameItem(senderName = message.userFullName)
-        MessageContent(messageContent = message.messageContent)
+        ) {
+            SenderNameItem(senderName = message.userFullName)
+            MessageContent(messageContent = message.messageContent)
+        }
+        ReactionItem(reactions = message.reactions)
     }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ReactionItem(reactions: List<ReactionUiModel>) {
+    FlowRow(
+        maxItemsInEachRow = 15,
+        content = {
+            reactions.forEach { reaction ->
+                Text(
+                    text = "${reaction.reactionString} ${reaction.count}",
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20))
+                        .background(color = Color.Yellow)
+                        .padding(4.dp)
+                )
+                HorizontalDivider(modifier = Modifier.size(1.dp))
+                VerticalDivider(modifier = Modifier.size(1.dp))
+            }
+        }
+    )
 }
 
 @Composable
@@ -102,7 +129,24 @@ private fun MessageItemPreview() {
         messageTimestamp = LocalDateTime.now(),
         avatarUrl = "",
         ownMessage = false,
-        reactions = listOf()
+        reactions = listOf(
+            ReactionUiModel(
+                reactionString = "U+1F929",
+                count = 2
+            ),
+            ReactionUiModel(
+                reactionString = "U+1F929",
+                count = 4
+            ),
+            ReactionUiModel(
+                reactionString = "U+1F929",
+                count = 1
+            ),
+            ReactionUiModel(
+                reactionString = "U+1F929",
+                count = 5
+            )
+        )
     )
     val ownMessageItem = MessageUiModel(
         messageId = 1,
@@ -112,7 +156,13 @@ private fun MessageItemPreview() {
         messageTimestamp = LocalDateTime.now(),
         avatarUrl = "",
         ownMessage = true,
-        reactions = listOf()
+        reactions = listOf(
+           
+            ReactionUiModel(
+                reactionString = "U+1F929",
+                count = 5
+            )
+        )
     )
     Column {
         MessageItem(message = item)

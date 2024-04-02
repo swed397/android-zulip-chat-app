@@ -2,6 +2,7 @@ package com.android.zulip.chat.app.domain.mapper
 
 import com.android.zulip.chat.app.data.db.entity.MessageEntity
 import com.android.zulip.chat.app.data.db.entity.ReactionEntity
+import com.android.zulip.chat.app.data.network.model.Event
 import com.android.zulip.chat.app.data.network.model.Message
 import com.android.zulip.chat.app.data.network.model.MessageEvent
 import com.android.zulip.chat.app.domain.model.MessageModel
@@ -50,4 +51,12 @@ fun MessageEvent.toEntity(): MessageEntity =
         content = content,
         topicName = topicName,
         streamName = streamName
+    )
+
+fun Event.toReactionEntity(): ReactionEntity =
+    ReactionEntity(
+        messageId = messageId,
+        userId = userId,
+        emojiCode = emojiCode,
+        emojiName = emojiName
     )

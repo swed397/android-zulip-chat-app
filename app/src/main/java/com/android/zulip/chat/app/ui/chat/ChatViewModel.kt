@@ -67,7 +67,7 @@ class ChatViewModel @AssistedInject constructor(
                     )
                 },
                 onSuccess = {},
-                onError = {}
+                onError = { stateController.sendEvent(ChatEvents.Internal.OnError) }
             )
         }
     }

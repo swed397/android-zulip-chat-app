@@ -1,5 +1,6 @@
 package com.android.zulip.chat.app.data.network.repo
 
+import android.util.Log
 import com.android.zulip.chat.app.data.db.dao.StreamDao
 import com.android.zulip.chat.app.data.network.ZulipApi
 import com.android.zulip.chat.app.data.network.model.StreamInfo
@@ -31,8 +32,8 @@ class ChannelsRepoImpl @Inject constructor(
             }
         } catch (e: CancellationException) {
             throw e
-        } catch (_: UnknownHostException) {
-
+        } catch (e: UnknownHostException) {
+            Log.println(Log.ERROR, "CHANEL REPO EXCEPT", e.message ?: "Oops")
         }
 
         return streamDao.getAllStreamsWithTopics().map { it.toEntity() }

@@ -5,8 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
@@ -36,7 +35,6 @@ fun UsersList(data: () -> List<UserModel>, onUserClick: (Long) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun UserListItem(
     userId: Long,
@@ -46,8 +44,8 @@ private fun UserListItem(
     onUserClick: (Long) -> Unit
 ) {
     ListItem(
-        headlineText = { Text(text = name) },
-        supportingText = { Text(text = email) },
+        headlineContent = { Text(text = name) },
+        supportingContent = { Text(text = email) },
         leadingContent = {
             if (avatarUrls.isNullOrEmpty()) {
                 Icon(
@@ -65,7 +63,7 @@ private fun UserListItem(
         },
         modifier = Modifier.clickable { onUserClick.invoke(userId) }
     )
-    Divider(color = Color.Gray, thickness = 1.dp)
+    HorizontalDivider(color = Color.Gray, thickness = 1.dp)
 }
 
 @Composable

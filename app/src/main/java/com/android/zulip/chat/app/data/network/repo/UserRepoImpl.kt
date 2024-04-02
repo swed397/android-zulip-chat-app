@@ -1,5 +1,6 @@
 package com.android.zulip.chat.app.data.network.repo
 
+import android.util.Log
 import com.android.zulip.chat.app.data.db.dao.UserDao
 import com.android.zulip.chat.app.data.network.ZulipApi
 import com.android.zulip.chat.app.domain.mapper.currentUserToDto
@@ -23,8 +24,8 @@ class UserRepoImpl @Inject constructor(
             }
         } catch (e: CancellationException) {
             throw e
-        } catch (_: UnknownHostException) {
-
+        } catch (e: UnknownHostException) {
+            Log.println(Log.ERROR, "USER REPO EXCEPT", e.message ?: "Oops")
         }
 
         return userDao.getAllUsers().map { it.toEntity() }

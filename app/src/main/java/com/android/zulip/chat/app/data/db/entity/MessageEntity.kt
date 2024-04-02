@@ -17,12 +17,11 @@ data class MessageEntity(
     @ColumnInfo("topic_name") val topicName: String
 )
 
-@Entity(tableName = "reactions")
+@Entity(tableName = "reactions", primaryKeys = ["message_id", "user_id", "emoji_code"])
 data class ReactionEntity(
-    @PrimaryKey @ColumnInfo("id") val id: Long? = null,
-    @ColumnInfo("message_id") val messageId: Long?,
-    @ColumnInfo("user_id") val userId: Long?,
-    @ColumnInfo("emoji_code") val emojiCode: String?,
+    @ColumnInfo("message_id") val messageId: Long,
+    @ColumnInfo("user_id") val userId: Long,
+    @ColumnInfo("emoji_code") val emojiCode: String,
     @ColumnInfo("emoji_name") val emojiName: String?,
 )
 

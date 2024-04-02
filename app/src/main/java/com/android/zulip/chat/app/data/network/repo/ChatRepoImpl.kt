@@ -1,5 +1,6 @@
 package com.android.zulip.chat.app.data.network.repo
 
+import android.util.Log
 import com.android.zulip.chat.app.data.db.dao.ChatDao
 import com.android.zulip.chat.app.data.network.ZulipApi
 import com.android.zulip.chat.app.data.network.model.Narrow
@@ -26,7 +27,7 @@ class ChatRepoImpl @Inject constructor(
         topicName: String
     ): List<MessageModel> {
         try {
-            zulipApi.getAllMessages(
+            val response = zulipApi.getAllMessages(
                 narrow = Gson().toJson(
                     listOf(
                         Narrow(
@@ -39,7 +40,9 @@ class ChatRepoImpl @Inject constructor(
                         )
                     )
                 )
-            ).messages
+            )
+            chatDao.deleteAllReactions()
+            response.messages
                 .map { it.toEntity(streamName, topicName) }
                 .forEach {
                     chatDao.insertMessagesWithReactionsList(
@@ -49,8 +52,8 @@ class ChatRepoImpl @Inject constructor(
                 }
         } catch (e: CancellationException) {
             throw e
-        } catch (_: UnknownHostException) {
-
+        } catch (e: UnknownHostException) {
+            Log.println(Log.ERROR, "CHAT REPO EXCEPT", e.message ?: "Oops")
         }
 
         return chatDao.getAllMessagesWithReactions(
@@ -63,11 +66,11 @@ class ChatRepoImpl @Inject constructor(
         streamName: String,
         topicName: String
     ): Flow<List<MessageModel>> =
-        chatDao.getAllMessagesByStreamNameAndTopicNameByFlow(
+        chatDao.getAllMessagesWithReactionsFlow(
             streamName = streamName,
             topicName = topicName
-            //todo fix
-        ).map { it.map { messageEntity -> messageEntity.toDto(listOf()) } }
+        )
+            .map { it.map { messageEntity -> messageEntity.messageEntity.toDto(messageEntity.reactionsList) } }
 
     override suspend fun sendMessage(
         streamName: String,

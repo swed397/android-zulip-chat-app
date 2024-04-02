@@ -1,6 +1,7 @@
 package com.android.zulip.chat.app.data.db.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -53,8 +54,11 @@ interface ChatDao {
         "SELECT * FROM message WHERE message.stream_name = :streamName and " +
                 "message.topic_name = :topicName ORDER BY message.message_id DESC"
     )
-    fun getAllMessagesByStreamNameAndTopicNameByFlow(
+    fun getAllMessagesWithReactionsFlow(
         streamName: String,
         topicName: String
-    ): Flow<List<MessageEntity>>
+    ): Flow<List<MessagesWithReactions>>
+
+    @Query("DELETE FROM reactions")
+    suspend fun deleteAllReactions()
 }

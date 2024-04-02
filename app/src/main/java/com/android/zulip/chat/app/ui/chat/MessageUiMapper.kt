@@ -20,7 +20,15 @@ class MessageUiMapper @Inject constructor() {
                 messageTimestamp = LocalDateTime.now(),
                 avatarUrl = it.avatarUrl,
                 ownMessage = it.userId == OWN_USER_ID,
-                reactions = it.reactions.map { reaction -> reaction.toEmojiString() }
+                reactions = it.reactions
+                    .groupingBy { reaction -> reaction }
+                    .eachCount()
+                    .map { map ->
+                        ReactionUiModel(
+                            reactionString = map.key.toEmojiString(),
+                            count = map.value
+                        )
+                    }
             )
         }
 }

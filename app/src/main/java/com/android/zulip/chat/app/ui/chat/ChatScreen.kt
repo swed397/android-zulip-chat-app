@@ -14,6 +14,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -151,7 +152,7 @@ private fun MessagesList(messages: List<MessageUiModel>) {
         ) {
             items(items = messages, key = { it.messageId }) { message ->
                 MessageItem(message = message)
-                Divider(thickness = 5.dp, color = Color.Transparent)
+                HorizontalDivider(thickness = 20.dp, color = Color.Transparent)
             }
         }
     }

@@ -1,7 +1,10 @@
 package com.android.zulip.chat.app.data.network
 
 import com.android.zulip.chat.app.data.db.dao.EventDao
+import com.android.zulip.chat.app.data.network.model.EventType
+import com.android.zulip.chat.app.data.network.model.OpType
 import com.android.zulip.chat.app.domain.mapper.toEntity
+import com.android.zulip.chat.app.domain.mapper.toReactionEntity
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
 import java.net.SocketTimeoutException
@@ -35,13 +38,32 @@ class ApiEventHandler @Inject constructor(
                         throw exception
                     }
                     .onSuccess {
-                        it.events.map { message -> message.message.toEntity() }.apply {
-                            eventDao.insertNewMessages(this)
+                        it.events.forEach { event ->
+                            when (event.type) {
+                                EventType.MESSAGE -> {
+                                    event.message.toEntity().also { eventDao.insertNewMessage(it) }
+                                }
+
+                                EventType.REACTION -> {
+                                    when (event.opType) {
+                                        OpType.ADD -> {
+                                            event.toReactionEntity()
+                                                .also { entity -> eventDao.insertNewReaction(entity) }
+                                        }
+
+                                        OpType.REMOVE -> {
+                                            event.toReactionEntity().also { entity ->
+                                                eventDao.deleteReaction(entity)
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
                         }
                         return@onSuccess
                     }
             }
         }
     }
-
 }
