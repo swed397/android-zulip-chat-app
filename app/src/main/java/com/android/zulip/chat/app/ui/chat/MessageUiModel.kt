@@ -14,6 +14,7 @@ data class MessageUiModel(
 )
 
 data class ReactionUiModel(
-    val reactionString: String,
+    val emojiName: String,
+    val emojiUnicode: String,
     val count: Int,
 )

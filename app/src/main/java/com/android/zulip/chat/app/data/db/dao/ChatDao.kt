@@ -60,4 +60,7 @@ interface ChatDao {
 
     @Query("DELETE FROM reactions")
     suspend fun deleteAllReactions()
+
+    @Query("SELECT * FROM message where message_id = :messageId")
+    suspend fun getMessageWithReactionsById(messageId: Long): MessagesWithReactions
 }

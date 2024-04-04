@@ -32,9 +32,8 @@ import androidx.compose.ui.unit.dp
 import com.android.zulip.chat.app.R
 import com.android.zulip.chat.app.domain.chat.ChatEvents
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatBottomBar(onSendMessageEvent: (chatEvent: ChatEvents.Ui.SendMessage) -> Unit) {
+fun ChatBottomBar(onSendMessageEvent: (message: String) -> Unit) {
     Box(
         contentAlignment = Alignment.CenterStart,
         modifier = Modifier
@@ -74,7 +73,7 @@ fun ChatBottomBar(onSendMessageEvent: (chatEvent: ChatEvents.Ui.SendMessage) -> 
                     .align(Alignment.CenterVertically)
                     .padding(start = 8.dp)
                     .clickable {
-                        onSendMessageEvent.invoke(ChatEvents.Ui.SendMessage(text))
+                        onSendMessageEvent.invoke(text)
                         text = ""
                     }
             )

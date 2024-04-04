@@ -5,6 +5,7 @@ import com.android.zulip.chat.app.data.db.entity.ReactionEntity
 import com.android.zulip.chat.app.data.network.model.Event
 import com.android.zulip.chat.app.data.network.model.Message
 import com.android.zulip.chat.app.data.network.model.MessageEvent
+import com.android.zulip.chat.app.domain.model.EmojiModel
 import com.android.zulip.chat.app.domain.model.MessageModel
 import java.time.LocalDateTime
 
@@ -39,7 +40,13 @@ fun MessageEntity.toDto(reactionsList: List<ReactionEntity>): MessageModel =
         messageTimestamp = LocalDateTime.now(),
         avatarUrl = avatarUrl,
         //ToDo fix
-        reactions = reactionsList.map { it.emojiCode }
+        reactions = reactionsList.map {
+            EmojiModel(
+                emojiCode = it.emojiCode,
+                emojiName = it.emojiName!!,
+                userOwnerId = it.userId
+            )
+        }
     )
 
 fun MessageEvent.toEntity(): MessageEntity =

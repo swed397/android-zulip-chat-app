@@ -17,4 +17,10 @@ interface ChatRepo {
         topicName: String,
         message: String
     ): SendMessageResponse
+
+    suspend fun getMessageWithReactionsByMessageId(messageId: Long): MessageModel
+
+    suspend fun addEmoji(messageId: Long, emojiName: String)
+
+    suspend fun deleteEmoji(messageId: Long, emojiName: String)
 }

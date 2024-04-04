@@ -18,6 +18,8 @@ sealed interface ChatEvents : Event {
 
         @JvmInline
         value class SendMessage(val message: String) : Ui
+
+        data class ClickOnEmoji(val messageId: Long, val emojiName: String) : Ui
     }
 
     sealed interface Internal : ChatEvents {
@@ -26,7 +28,6 @@ sealed interface ChatEvents : Event {
         data class OnData(val messagesData: List<MessageModel>) : Internal
 
         object OnError : Internal
-
     }
 }
 
@@ -39,5 +40,7 @@ sealed interface ChatAction : Action {
 
         @JvmInline
         value class SendMessage(val message: String) : Internal
+
+        data class AddOrRemoveEmoji(val messageId: Long, val emojiName: String) : Internal
     }
 }

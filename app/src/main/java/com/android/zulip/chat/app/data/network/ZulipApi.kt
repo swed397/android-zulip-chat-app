@@ -4,10 +4,12 @@ import com.android.zulip.chat.app.data.network.model.EventRegisterQueueRs
 import com.android.zulip.chat.app.data.network.model.EventResponse
 import com.android.zulip.chat.app.data.network.model.Members
 import com.android.zulip.chat.app.data.network.model.MessagesResponse
+import com.android.zulip.chat.app.data.network.model.ReactionRs
 import com.android.zulip.chat.app.data.network.model.SendMessageResponse
 import com.android.zulip.chat.app.data.network.model.Streams
 import com.android.zulip.chat.app.data.network.model.SubscribedStreams
 import com.android.zulip.chat.app.data.network.model.Topics
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -55,4 +57,16 @@ interface ZulipApi {
         @Query("topic") topic: String,
         @Query("content") content: String,
     ): SendMessageResponse
+
+    @DELETE("messages/{message_id}/reactions")
+    suspend fun deleteEmoji(
+        @Path("message_id") messageId: Long,
+        @Query("emoji_name") emojiName: String
+    ): ReactionRs
+
+    @POST("messages/{message_id}/reactions")
+    suspend fun addEmoji(
+        @Path("message_id") messageId: Long,
+        @Query("emoji_name") emojiName: String
+    ): ReactionRs
 }

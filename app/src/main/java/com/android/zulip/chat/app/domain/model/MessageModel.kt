@@ -9,5 +9,7 @@ data class MessageModel(
     val userFullName: String,
     val messageTimestamp: LocalDateTime,
     val avatarUrl: String,
-    val reactions: List<String>
+    val reactions: List<EmojiModel>
 )
+
+data class EmojiModel(val emojiCode: String, val emojiName: String, val userOwnerId: Long)

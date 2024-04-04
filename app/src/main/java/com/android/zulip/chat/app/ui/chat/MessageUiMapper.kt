@@ -2,6 +2,7 @@ package com.android.zulip.chat.app.ui.chat
 
 import com.android.zulip.chat.app.domain.model.MessageModel
 import com.android.zulip.chat.app.utils.OWN_USER_ID
+import com.android.zulip.chat.app.utils.toEmojiCode
 import com.android.zulip.chat.app.utils.toEmojiString
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -21,14 +22,18 @@ class MessageUiMapper @Inject constructor() {
                 avatarUrl = it.avatarUrl,
                 ownMessage = it.userId == OWN_USER_ID,
                 reactions = it.reactions
-                    .groupingBy { reaction -> reaction }
-                    .eachCount()
+                    .groupBy { reaction -> reaction.emojiName }
                     .map { map ->
-                        ReactionUiModel(
-                            reactionString = map.key.toEmojiString(),
-                            count = map.value
-                        )
+                        map.value.map { emojiModel ->
+                            ReactionUiModel(
+                                emojiName = emojiModel.emojiName,
+                                emojiUnicode = emojiModel.emojiCode.toEmojiString(),
+                                count = map.value.size
+                            )
+                        }
                     }
+                    .flatten()
+                    .distinct()
             )
         }
 }

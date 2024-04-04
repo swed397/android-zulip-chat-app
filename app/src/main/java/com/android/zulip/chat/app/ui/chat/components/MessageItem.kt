@@ -31,7 +31,10 @@ import com.android.zulip.chat.app.ui.chat.ReactionUiModel
 import java.time.LocalDateTime
 
 @Composable
-fun MessageItem(message: MessageUiModel) {
+fun MessageItem(
+    message: MessageUiModel,
+    onClickOnEmoji: (emojiName: String, messageId: Long) -> Unit
+) {
     Row(
         horizontalArrangement = if (message.ownMessage) Arrangement.End else Arrangement.Start,
         modifier = Modifier
@@ -41,7 +44,7 @@ fun MessageItem(message: MessageUiModel) {
         if (message.ownMessage.not()) {
             CircleIcon(avatarUrl = message.avatarUrl, onClickableImage = {})
         }
-        MessageContentItem(message = message)
+        MessageContentItem(message = message, onClickOnEmoji = onClickOnEmoji)
     }
 }
 
@@ -61,7 +64,10 @@ private fun CircleIcon(
 }
 
 @Composable
-private fun MessageContentItem(message: MessageUiModel) {
+private fun MessageContentItem(
+    message: MessageUiModel,
+    onClickOnEmoji: (emojiName: String, messageId: Long) -> Unit
+) {
     Column(horizontalAlignment = if (message.ownMessage) Alignment.End else Alignment.Start) {
         Column(
             modifier = Modifier
@@ -74,23 +80,29 @@ private fun MessageContentItem(message: MessageUiModel) {
             SenderNameItem(senderName = message.userFullName)
             MessageContent(messageContent = message.messageContent)
         }
-        ReactionItem(reactions = message.reactions)
+        ReactionItem(messageUiModel = message, onClickOnEmoji = onClickOnEmoji)
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ReactionItem(reactions: List<ReactionUiModel>) {
+private fun ReactionItem(
+    messageUiModel: MessageUiModel,
+    onClickOnEmoji: (emojiName: String, messageId: Long) -> Unit
+) {
     FlowRow(
         maxItemsInEachRow = 15,
         content = {
-            reactions.forEach { reaction ->
+            messageUiModel.reactions.forEach { reaction ->
                 Text(
-                    text = "${reaction.reactionString} ${reaction.count}",
+                    text = "${reaction.emojiUnicode} ${reaction.count}",
                     modifier = Modifier
                         .clip(RoundedCornerShape(20))
                         .background(color = Color.Yellow)
                         .padding(4.dp)
+                        .clickable {
+                            onClickOnEmoji.invoke(reaction.emojiName, messageUiModel.messageId)
+                        }
                 )
                 HorizontalDivider(modifier = Modifier.size(1.dp))
                 VerticalDivider(modifier = Modifier.size(1.dp))
@@ -131,19 +143,23 @@ private fun MessageItemPreview() {
         ownMessage = false,
         reactions = listOf(
             ReactionUiModel(
-                reactionString = "U+1F929",
+                emojiUnicode = "U+1F929",
+                emojiName = "TEST",
                 count = 2
             ),
             ReactionUiModel(
-                reactionString = "U+1F929",
+                emojiUnicode = "U+1F929",
+                emojiName = "TEST",
                 count = 4
             ),
             ReactionUiModel(
-                reactionString = "U+1F929",
+                emojiUnicode = "U+1F929",
+                emojiName = "TEST",
                 count = 1
             ),
             ReactionUiModel(
-                reactionString = "U+1F929",
+                emojiUnicode = "U+1F929",
+                emojiName = "TEST",
                 count = 5
             )
         )
@@ -157,15 +173,16 @@ private fun MessageItemPreview() {
         avatarUrl = "",
         ownMessage = true,
         reactions = listOf(
-           
+
             ReactionUiModel(
-                reactionString = "U+1F929",
+                emojiUnicode = "U+1F929",
+                emojiName = "TEST",
                 count = 5
             )
         )
     )
     Column {
-        MessageItem(message = item)
-        MessageItem(message = ownMessageItem)
+        MessageItem(message = item, onClickOnEmoji = { _, _ -> })
+        MessageItem(message = ownMessageItem, onClickOnEmoji = { _, _ -> })
     }
 }

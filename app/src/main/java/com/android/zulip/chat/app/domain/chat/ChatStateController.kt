@@ -36,6 +36,15 @@ class ChatStateController @Inject constructor() :
                 is ChatEvents.Internal.OnData -> {
                     ChatState.Content(data = event.messagesData) to listOf()
                 }
+
+                is ChatEvents.Ui.ClickOnEmoji -> {
+                    currentState to listOf(
+                        ChatAction.Internal.AddOrRemoveEmoji(
+                            messageId = event.messageId,
+                            emojiName = event.emojiName
+                        )
+                    )
+                }
             }
 
             _state.value = newState

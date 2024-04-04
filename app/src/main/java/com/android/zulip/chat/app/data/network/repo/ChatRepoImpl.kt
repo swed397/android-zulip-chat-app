@@ -82,4 +82,18 @@ class ChatRepoImpl @Inject constructor(
             topic = topicName,
             content = message
         )
+
+    override suspend fun getMessageWithReactionsByMessageId(messageId: Long): MessageModel {
+        val messagesWithReactions = chatDao.getMessageWithReactionsById(messageId = messageId)
+        return messagesWithReactions.messageEntity.toDto(messagesWithReactions.reactionsList)
+    }
+
+    override suspend fun addEmoji(messageId: Long, emojiName: String) {
+        println("ADD EMOJI REPO")
+        zulipApi.addEmoji(emojiName = emojiName, messageId = messageId)
+    }
+
+    override suspend fun deleteEmoji(messageId: Long, emojiName: String) {
+        zulipApi.deleteEmoji(emojiName = emojiName, messageId = messageId)
+    }
 }

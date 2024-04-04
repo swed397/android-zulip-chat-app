@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
@@ -64,7 +63,6 @@ fun ChatScreenHolder(streamName: String, topicName: String) {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChatScreen(
     streamName: String,
@@ -74,7 +72,9 @@ private fun ChatScreen(
 ) {
     Scaffold(
         topBar = { ChatAppBar(streamName = streamName, topicName = topicName) },
-        bottomBar = { ChatBottomBar(onSendMessageEvent = onEvent) },
+        bottomBar = {
+            ChatBottomBar(onSendMessageEvent = { onEvent.invoke(ChatEvents.Ui.SendMessage(it)) })
+        },
         content = { padding ->
             Box(
                 contentAlignment = Alignment.Center,
@@ -88,7 +88,18 @@ private fun ChatScreen(
             ) {
 
                 when (state) {
-                    is ChatUiState.Content -> MessagesList(messages = state.messagesData)
+                    is ChatUiState.Content -> MessagesList(
+                        messages = state.messagesData,
+                        onClickOnEmoji = { emojiName, messageId ->
+                            onEvent.invoke(
+                                ChatEvents.Ui.ClickOnEmoji(
+                                    messageId = messageId,
+                                    emojiName = emojiName
+                                )
+                            )
+                        }
+                    )
+
                     is ChatUiState.Loading -> Preloader()
                     is ChatUiState.Error -> {}
                 }
@@ -97,9 +108,11 @@ private fun ChatScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MessagesList(messages: List<MessageUiModel>) {
+private fun MessagesList(
+    messages: List<MessageUiModel>,
+    onClickOnEmoji: (emojiName: String, messageId: Long) -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     var fabIsVisible by remember { mutableStateOf(false) }
@@ -150,7 +163,7 @@ private fun MessagesList(messages: List<MessageUiModel>) {
                 .nestedScroll(nestedScrollConnection)
         ) {
             items(items = messages, key = { it.messageId }) { message ->
-                MessageItem(message = message)
+                MessageItem(message = message, onClickOnEmoji = onClickOnEmoji)
                 HorizontalDivider(thickness = 20.dp, color = Color.Transparent)
             }
         }

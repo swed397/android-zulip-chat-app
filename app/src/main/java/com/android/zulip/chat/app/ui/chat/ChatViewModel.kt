@@ -7,6 +7,7 @@ import com.android.zulip.chat.app.domain.chat.ChatState
 import com.android.zulip.chat.app.domain.chat.ChatStateController
 import com.android.zulip.chat.app.domain.repo.ChatRepo
 import com.android.zulip.chat.app.ui.base.BaseViewModelWithStateController
+import com.android.zulip.chat.app.utils.OWN_USER_ID
 import com.android.zulip.chat.app.utils.runSuspendCatching
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -38,6 +39,10 @@ class ChatViewModel @AssistedInject constructor(
             )
 
             is ChatAction.Internal.SendMessage -> sendMessage(action.message)
+            is ChatAction.Internal.AddOrRemoveEmoji -> addOrRemoveEmoji(
+                messageId = action.messageId,
+                emojiName = action.emojiName
+            )
         }
     }
 
@@ -80,6 +85,31 @@ class ChatViewModel @AssistedInject constructor(
             ).collect {
                 stateController.sendEvent(ChatEvents.Internal.OnData(it))
             }
+        }
+    }
+
+    private fun addOrRemoveEmoji(messageId: Long, emojiName: String) {
+        viewModelScope.launch {
+            runSuspendCatching(
+                action = {
+                    val messageWithReactions =
+                        chatRepo.getMessageWithReactionsByMessageId(messageId = messageId)
+
+                    val reaction =
+                        messageWithReactions.reactions.firstOrNull {
+                            it.emojiName == emojiName && it.userOwnerId == OWN_USER_ID
+                        }
+
+                    if (reaction == null) {
+                        chatRepo.addEmoji(messageId = messageId, emojiName = emojiName)
+                    } else {
+                        chatRepo.deleteEmoji(messageId = messageId, emojiName = emojiName)
+                    }
+
+                },
+                onSuccess = {},
+                onError = { stateController.sendEvent(ChatEvents.Internal.OnError) }
+            )
         }
     }
 
