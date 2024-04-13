@@ -9,7 +9,11 @@ class ChatStateUiMapper @Inject constructor(private val messageUiMapper: Message
 
     override fun invoke(state: ChatState): ChatUiState = when (state) {
         is ChatState.Content -> {
-            ChatUiState.Content(messageUiMapper(state.data))
+            ChatUiState.Content(
+                messagesData = messageUiMapper(state.data),
+                emojis = state.emojis,
+                openEmojiPicker = state.emojis.isNullOrEmpty().not()
+            )
         }
 
         is ChatState.Error -> ChatUiState.Error

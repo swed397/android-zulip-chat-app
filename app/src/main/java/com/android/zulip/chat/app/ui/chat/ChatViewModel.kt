@@ -5,6 +5,7 @@ import com.android.zulip.chat.app.domain.chat.ChatAction
 import com.android.zulip.chat.app.domain.chat.ChatEvents
 import com.android.zulip.chat.app.domain.chat.ChatState
 import com.android.zulip.chat.app.domain.chat.ChatStateController
+import com.android.zulip.chat.app.domain.model.Emoji
 import com.android.zulip.chat.app.domain.repo.ChatRepo
 import com.android.zulip.chat.app.ui.base.BaseViewModelWithStateController
 import com.android.zulip.chat.app.utils.OWN_USER_ID
@@ -12,6 +13,7 @@ import com.android.zulip.chat.app.utils.runSuspendCatching
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ChatViewModel @AssistedInject constructor(
@@ -26,13 +28,17 @@ class ChatViewModel @AssistedInject constructor(
     initEvent = ChatEvents.Internal.OnInit
 ) {
 
-    override suspend fun handleAction(action: ChatAction) {
-        when (action) {
-            is ChatAction.Internal.LoadAllMessages -> loadAllMessages(
+    init {
+        viewModelScope.launch {
+            chatRepo.getAllMassagesByStreamNameAndTopicName(
                 streamName = streamName,
                 topicName = topicName
             )
+        }
+    }
 
+    override suspend fun handleAction(action: ChatAction) {
+        when (action) {
             is ChatAction.Internal.SubscribeOnMessageFlow -> subscribeOnMessagesFlow(
                 streamName = streamName,
                 topicName = topicName
@@ -43,21 +49,9 @@ class ChatViewModel @AssistedInject constructor(
                 messageId = action.messageId,
                 emojiName = action.emojiName
             )
-        }
-    }
 
-    private fun loadAllMessages(streamName: String, topicName: String) {
-        viewModelScope.launch {
-            runSuspendCatching(
-                action = {
-                    chatRepo.getAllMassagesByStreamNameAndTopicName(
-                        streamName = streamName,
-                        topicName = topicName
-                    )
-                },
-                onSuccess = { data -> stateController.sendEvent(ChatEvents.Internal.OnData(data)) },
-                onError = { stateController.sendEvent(ChatEvents.Internal.OnError) }
-            )
+            is ChatAction.Internal.LoadEmojis -> loadEmojis()
+            is ChatAction.Internal.DetachEmojis -> detachEmojis()
         }
     }
 
@@ -86,6 +80,27 @@ class ChatViewModel @AssistedInject constructor(
                 stateController.sendEvent(ChatEvents.Internal.OnData(it))
             }
         }
+    }
+
+    private fun loadEmojis() {
+        viewModelScope.launch {
+            val emojis = chatRepo.loadAllEmojis()
+            chatRepo.subscribeOnMessagesFlow(
+                streamName = streamName,
+                topicName = topicName
+            ).collect {
+                stateController.sendEvent(
+                    ChatEvents.Internal.OnData(
+                        messagesData = it,
+                        emojis = emojis
+                    )
+                )
+            }
+        }
+    }
+
+    private fun detachEmojis() {
+        subscribeOnMessagesFlow(streamName = streamName, topicName = topicName)
     }
 
     private fun addOrRemoveEmoji(messageId: Long, emojiName: String) {

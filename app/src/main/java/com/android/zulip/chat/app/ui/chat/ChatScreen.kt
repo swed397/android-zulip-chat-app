@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
@@ -42,6 +43,7 @@ import com.android.zulip.chat.app.domain.chat.ChatEvents
 import com.android.zulip.chat.app.ui.Preloader
 import com.android.zulip.chat.app.ui.chat.components.ChatAppBar
 import com.android.zulip.chat.app.ui.chat.components.ChatBottomBar
+import com.android.zulip.chat.app.ui.chat.components.EmojiPicker
 import com.android.zulip.chat.app.ui.chat.components.MessageItem
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -63,6 +65,7 @@ fun ChatScreenHolder(streamName: String, topicName: String) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChatScreen(
     streamName: String,
@@ -89,7 +92,8 @@ private fun ChatScreen(
 
                 when (state) {
                     is ChatUiState.Content -> MessagesList(
-                        messages = state.messagesData,
+                        state = state,
+                        onClickOnMessage = { onEvent.invoke(ChatEvents.Ui.OpenEmojiPicker) },
                         onClickOnEmoji = { emojiName, messageId ->
                             onEvent.invoke(
                                 ChatEvents.Ui.ClickOnEmoji(
@@ -97,7 +101,8 @@ private fun ChatScreen(
                                     emojiName = emojiName
                                 )
                             )
-                        }
+                        },
+                        onDismissEmojiPicker = { onEvent.invoke(ChatEvents.Ui.CloseEmojiPicker) }
                     )
 
                     is ChatUiState.Loading -> Preloader()
@@ -108,11 +113,20 @@ private fun ChatScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MessagesList(
-    messages: List<MessageUiModel>,
-    onClickOnEmoji: (emojiName: String, messageId: Long) -> Unit
+    state: ChatUiState.Content,
+    onClickOnMessage: () -> Unit,
+    onClickOnEmoji: (String, Long) -> Unit,
+    onDismissEmojiPicker: () -> Unit,
 ) {
+    EmojiPicker(
+        emojis = state.emojis ?: emptyList(),
+        isPickerShow = state.openEmojiPicker,
+        onDismiss = onDismissEmojiPicker
+    )
+
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     var fabIsVisible by remember { mutableStateOf(false) }
@@ -132,7 +146,7 @@ private fun MessagesList(
         }
     }
 
-    LaunchedEffect(messages) {
+    LaunchedEffect(state.messagesData) {
         coroutineScope.launch {
             if (listState.firstVisibleItemIndex == 0 || listState.firstVisibleItemIndex == 1) {
                 listState.animateScrollToItem(index = 0)
@@ -162,8 +176,12 @@ private fun MessagesList(
                 .padding(bottom = 10.dp)
                 .nestedScroll(nestedScrollConnection)
         ) {
-            items(items = messages, key = { it.messageId }) { message ->
-                MessageItem(message = message, onClickOnEmoji = onClickOnEmoji)
+            items(items = state.messagesData, key = { it.messageId }) { message ->
+                MessageItem(
+                    message = message,
+                    onClickOnMessage = onClickOnMessage,
+                    onClickOnEmoji = onClickOnEmoji
+                )
                 HorizontalDivider(thickness = 20.dp, color = Color.Transparent)
             }
         }

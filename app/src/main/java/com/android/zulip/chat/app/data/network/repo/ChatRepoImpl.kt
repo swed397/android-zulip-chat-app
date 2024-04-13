@@ -8,9 +8,12 @@ import com.android.zulip.chat.app.data.network.model.NarrowType
 import com.android.zulip.chat.app.data.network.model.SendMessageResponse
 import com.android.zulip.chat.app.domain.mapper.toDto
 import com.android.zulip.chat.app.domain.mapper.toEntity
+import com.android.zulip.chat.app.domain.model.Emoji
 import com.android.zulip.chat.app.domain.model.MessageModel
 import com.android.zulip.chat.app.domain.repo.ChatRepo
 import com.google.gson.Gson
+import emoji.core.datasource.EmojiDataSource
+import emoji.core.model.NetworkEmoji
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.net.UnknownHostException
@@ -19,7 +22,8 @@ import kotlin.coroutines.cancellation.CancellationException
 
 class ChatRepoImpl @Inject constructor(
     private val zulipApi: ZulipApi,
-    private val chatDao: ChatDao
+    private val chatDao: ChatDao,
+    private val emojiDataSource: EmojiDataSource
 ) : ChatRepo {
 
     override suspend fun getAllMassagesByStreamNameAndTopicName(
@@ -90,10 +94,12 @@ class ChatRepoImpl @Inject constructor(
 
     override suspend fun addEmoji(messageId: Long, emojiName: String) {
         println("ADD EMOJI REPO")
-        zulipApi.addEmoji(emojiName = emojiName, messageId = messageId)
+        zulipApi.addEmojiByName(emojiName = emojiName, messageId = messageId)
     }
 
     override suspend fun deleteEmoji(messageId: Long, emojiName: String) {
         zulipApi.deleteEmoji(emojiName = emojiName, messageId = messageId)
     }
+
+    override suspend fun loadAllEmojis(): List<Emoji> = chatDao.getAllEmojis().map { it.toDto() }
 }

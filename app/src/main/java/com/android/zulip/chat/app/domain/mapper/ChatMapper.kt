@@ -1,10 +1,12 @@
 package com.android.zulip.chat.app.domain.mapper
 
+import com.android.zulip.chat.app.data.db.entity.EmojiEntity
 import com.android.zulip.chat.app.data.db.entity.MessageEntity
 import com.android.zulip.chat.app.data.db.entity.ReactionEntity
 import com.android.zulip.chat.app.data.network.model.Event
 import com.android.zulip.chat.app.data.network.model.Message
 import com.android.zulip.chat.app.data.network.model.MessageEvent
+import com.android.zulip.chat.app.domain.model.Emoji
 import com.android.zulip.chat.app.domain.model.EmojiModel
 import com.android.zulip.chat.app.domain.model.MessageModel
 import java.time.LocalDateTime
@@ -66,4 +68,10 @@ fun Event.toReactionEntity(): ReactionEntity =
         userId = userId,
         emojiCode = emojiCode,
         emojiName = emojiName
+    )
+
+fun EmojiEntity.toDto(): Emoji =
+    Emoji(
+        emojiName = emojiName,
+        emojiCode = emojiCode
     )

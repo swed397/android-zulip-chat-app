@@ -33,6 +33,7 @@ import java.time.LocalDateTime
 @Composable
 fun MessageItem(
     message: MessageUiModel,
+    onClickOnMessage: () -> Unit,
     onClickOnEmoji: (emojiName: String, messageId: Long) -> Unit
 ) {
     Row(
@@ -44,7 +45,11 @@ fun MessageItem(
         if (message.ownMessage.not()) {
             CircleIcon(avatarUrl = message.avatarUrl, onClickableImage = {})
         }
-        MessageContentItem(message = message, onClickOnEmoji = onClickOnEmoji)
+        MessageContentItem(
+            message = message,
+            onClickOnMessage = onClickOnMessage,
+            onClickOnEmoji = onClickOnEmoji
+        )
     }
 }
 
@@ -66,7 +71,8 @@ private fun CircleIcon(
 @Composable
 private fun MessageContentItem(
     message: MessageUiModel,
-    onClickOnEmoji: (emojiName: String, messageId: Long) -> Unit
+    onClickOnEmoji: (emojiName: String, messageId: Long) -> Unit,
+    onClickOnMessage: () -> Unit
 ) {
     Column(horizontalAlignment = if (message.ownMessage) Alignment.End else Alignment.Start) {
         Column(
@@ -75,7 +81,7 @@ private fun MessageContentItem(
                 .widthIn(max = 217.dp)
                 .background(Color.Black)
                 .padding(start = 10.dp, end = 8.dp, bottom = 5.dp)
-
+                .clickable { onClickOnMessage.invoke() }
         ) {
             SenderNameItem(senderName = message.userFullName)
             MessageContent(messageContent = message.messageContent)
@@ -182,7 +188,7 @@ private fun MessageItemPreview() {
         )
     )
     Column {
-        MessageItem(message = item, onClickOnEmoji = { _, _ -> })
-        MessageItem(message = ownMessageItem, onClickOnEmoji = { _, _ -> })
+        MessageItem(message = item, onClickOnMessage = {}, onClickOnEmoji = { _, _ -> })
+        MessageItem(message = ownMessageItem, onClickOnMessage = {}, onClickOnEmoji = { _, _ -> })
     }
 }

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.android.zulip.chat.app.data.db.entity.EmojiEntity
 import com.android.zulip.chat.app.data.db.entity.MessageEntity
 import com.android.zulip.chat.app.data.db.entity.MessagesWithReactions
 import com.android.zulip.chat.app.data.db.entity.ReactionEntity
@@ -63,4 +64,7 @@ interface ChatDao {
 
     @Query("SELECT * FROM message where message_id = :messageId")
     suspend fun getMessageWithReactionsById(messageId: Long): MessagesWithReactions
+
+    @Query("SELECT * FROM emojis")
+    suspend fun getAllEmojis(): List<EmojiEntity>
 }

@@ -23,10 +23,7 @@ class ChatStateController @Inject constructor() :
                 }
 
                 is ChatEvents.Internal.OnInit -> {
-                    ChatState.Loading to listOf(
-                        ChatAction.Internal.LoadAllMessages,
-                        ChatAction.Internal.SubscribeOnMessageFlow
-                    )
+                    ChatState.Loading to listOf(ChatAction.Internal.SubscribeOnMessageFlow)
                 }
 
                 is ChatEvents.Ui.SendMessage -> {
@@ -34,7 +31,7 @@ class ChatStateController @Inject constructor() :
                 }
 
                 is ChatEvents.Internal.OnData -> {
-                    ChatState.Content(data = event.messagesData) to listOf()
+                    ChatState.Content(data = event.messagesData, emojis = event.emojis) to listOf()
                 }
 
                 is ChatEvents.Ui.ClickOnEmoji -> {
@@ -44,6 +41,14 @@ class ChatStateController @Inject constructor() :
                             emojiName = event.emojiName
                         )
                     )
+                }
+
+                ChatEvents.Ui.OpenEmojiPicker -> {
+                    currentState to listOf(ChatAction.Internal.LoadEmojis)
+                }
+
+                ChatEvents.Ui.CloseEmojiPicker -> {
+                    currentState to listOf(ChatAction.Internal.DetachEmojis)
                 }
             }
 

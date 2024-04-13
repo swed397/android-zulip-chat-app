@@ -9,6 +9,8 @@ import com.android.zulip.chat.app.domain.repo.ChatRepo
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import emoji.core.datasource.EmojiDataSource
+import emoji.core.datasource.EmojiDataSourceImpl
 
 @Module(includes = [ChatModule.BindModule::class])
 class ChatModule {
@@ -19,7 +21,12 @@ class ChatModule {
 
     @Provides
     @ChatScope
-    fun providesChatRepo(zulipApi: ZulipApi, chatDao: ChatDao) = ChatRepoImpl(zulipApi, chatDao)
+    fun provideEmojiDatasource(): EmojiDataSource = EmojiDataSourceImpl()
+
+    @Provides
+    @ChatScope
+    fun providesChatRepo(zulipApi: ZulipApi, chatDao: ChatDao, emojiDataSource: EmojiDataSource) =
+        ChatRepoImpl(zulipApi, chatDao, emojiDataSource)
 
     @Module
     interface BindModule {
