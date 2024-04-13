@@ -32,7 +32,6 @@ fun EmojiPicker(
             content = {
                 FlowRow(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     emojis.forEach {
-                        println(it.emojiCode)
                         Text(
                             text = String(Character.toChars(it.emojiCode)),
                             fontSize = 30.sp

@@ -90,7 +90,6 @@ class ChatRepoImpl @Inject constructor(
     }
 
     override suspend fun addEmoji(messageId: Long, emojiName: String) {
-        println("ADD EMOJI REPO")
         zulipApi.addEmojiByName(emojiName = emojiName, messageId = messageId)
     }
 
