@@ -5,7 +5,6 @@ import com.android.zulip.chat.app.domain.chat.ChatAction
 import com.android.zulip.chat.app.domain.chat.ChatEvents
 import com.android.zulip.chat.app.domain.chat.ChatState
 import com.android.zulip.chat.app.domain.chat.ChatStateController
-import com.android.zulip.chat.app.domain.model.Emoji
 import com.android.zulip.chat.app.domain.repo.ChatRepo
 import com.android.zulip.chat.app.ui.base.BaseViewModelWithStateController
 import com.android.zulip.chat.app.utils.OWN_USER_ID
@@ -13,7 +12,6 @@ import com.android.zulip.chat.app.utils.runSuspendCatching
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ChatViewModel @AssistedInject constructor(

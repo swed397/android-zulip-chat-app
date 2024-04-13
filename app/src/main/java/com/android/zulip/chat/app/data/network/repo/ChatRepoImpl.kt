@@ -12,8 +12,6 @@ import com.android.zulip.chat.app.domain.model.Emoji
 import com.android.zulip.chat.app.domain.model.MessageModel
 import com.android.zulip.chat.app.domain.repo.ChatRepo
 import com.google.gson.Gson
-import emoji.core.datasource.EmojiDataSource
-import emoji.core.model.NetworkEmoji
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.net.UnknownHostException
@@ -23,7 +21,6 @@ import kotlin.coroutines.cancellation.CancellationException
 class ChatRepoImpl @Inject constructor(
     private val zulipApi: ZulipApi,
     private val chatDao: ChatDao,
-    private val emojiDataSource: EmojiDataSource
 ) : ChatRepo {
 
     override suspend fun getAllMassagesByStreamNameAndTopicName(

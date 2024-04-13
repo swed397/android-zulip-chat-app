@@ -3,7 +3,6 @@ package com.android.zulip.chat.app.domain.repo
 import com.android.zulip.chat.app.data.network.model.SendMessageResponse
 import com.android.zulip.chat.app.domain.model.Emoji
 import com.android.zulip.chat.app.domain.model.MessageModel
-import emoji.core.model.NetworkEmoji
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepo {
