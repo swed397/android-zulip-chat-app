@@ -9,7 +9,10 @@ import com.android.zulip.chat.app.domain.model.MessageModel
 sealed interface ChatState : State {
     object Loading : ChatState
 
-    data class Content(val data: List<MessageModel>, val emojis: List<Emoji>? = null) : ChatState
+    data class Content(
+        val data: List<MessageModel>,
+        val emojis: List<Emoji>? = null
+    ) : ChatState
 
     object Error : ChatState
 }
@@ -21,6 +24,8 @@ sealed interface ChatEvents : Event {
 
         object CloseEmojiPicker : Ui
 
+        data class AddNewEmoji(val messageId: Long, val emojiName: String) : Ui
+
         @JvmInline
         value class SendMessage(val message: String) : Ui
 
@@ -30,7 +35,11 @@ sealed interface ChatEvents : Event {
     sealed interface Internal : ChatEvents {
         object OnInit : Internal
 
-        data class OnData(val messagesData: List<MessageModel>, val emojis: List<Emoji>? = null) :
+        data class OnData(
+            val messagesData: List<MessageModel>,
+            val emojis: List<Emoji>? = null,
+
+            ) :
             Internal
 
         object OnError : Internal
@@ -48,6 +57,8 @@ sealed interface ChatAction : Action {
 
         @JvmInline
         value class SendMessage(val message: String) : Internal
+
+        data class AddNewEmoji(val messageId: Long, val emojiName: String) : Internal
 
         data class AddOrRemoveEmoji(val messageId: Long, val emojiName: String) : Internal
     }

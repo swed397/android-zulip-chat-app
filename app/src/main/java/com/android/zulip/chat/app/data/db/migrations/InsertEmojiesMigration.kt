@@ -7,7 +7,7 @@ val INSERT_EMOJIS_MIGRATION = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(
             "insert into emojis (emoji_name, emoji_code) values" +
-                    "('Grinning Face',0x1F600)," +
+                    "('Grinning',0x1F600)," +
                     "('Money,Mouth Face',0x1F60D)," +
                     "('Sunglasses',0x1F60E)," +
                     "('Face With Tears of Joy',0x1F602)," +

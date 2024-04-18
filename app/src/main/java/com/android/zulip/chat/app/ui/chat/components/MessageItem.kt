@@ -33,7 +33,7 @@ import java.time.LocalDateTime
 @Composable
 fun MessageItem(
     message: MessageUiModel,
-    onClickOnMessage: () -> Unit,
+    onClickOnMessage: (messageId: Long) -> Unit,
     onClickOnEmoji: (emojiName: String, messageId: Long) -> Unit
 ) {
     Row(
@@ -72,7 +72,7 @@ private fun CircleIcon(
 private fun MessageContentItem(
     message: MessageUiModel,
     onClickOnEmoji: (emojiName: String, messageId: Long) -> Unit,
-    onClickOnMessage: () -> Unit
+    onClickOnMessage: (messageId: Long) -> Unit,
 ) {
     Column(horizontalAlignment = if (message.ownMessage) Alignment.End else Alignment.Start) {
         Column(
@@ -81,7 +81,7 @@ private fun MessageContentItem(
                 .widthIn(max = 217.dp)
                 .background(Color.Black)
                 .padding(start = 10.dp, end = 8.dp, bottom = 5.dp)
-                .clickable { onClickOnMessage.invoke() }
+                .clickable { onClickOnMessage.invoke(message.messageId) }
         ) {
             SenderNameItem(senderName = message.userFullName)
             MessageContent(messageContent = message.messageContent)

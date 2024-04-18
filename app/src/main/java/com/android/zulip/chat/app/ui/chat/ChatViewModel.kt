@@ -50,6 +50,10 @@ class ChatViewModel @AssistedInject constructor(
 
             is ChatAction.Internal.LoadEmojis -> loadEmojis()
             is ChatAction.Internal.DetachEmojis -> detachEmojis()
+            is ChatAction.Internal.AddNewEmoji -> addNewEmoji(
+                emojiName = action.emojiName,
+                messageId = action.messageId
+            )
         }
     }
 
@@ -75,7 +79,7 @@ class ChatViewModel @AssistedInject constructor(
                 streamName = streamName,
                 topicName = topicName
             ).collect {
-                stateController.sendEvent(ChatEvents.Internal.OnData(it))
+                stateController.sendEvent(ChatEvents.Internal.OnData(it, emojis = null))
             }
         }
     }
@@ -94,6 +98,21 @@ class ChatViewModel @AssistedInject constructor(
                     )
                 )
             }
+        }
+    }
+
+    private fun addNewEmoji(emojiName: String, messageId: Long) {
+        viewModelScope.launch {
+            runSuspendCatching(
+                action = { chatRepo.addEmoji(messageId = messageId, emojiName = emojiName) },
+                onSuccess = {
+                    subscribeOnMessagesFlow(
+                        streamName = streamName,
+                        topicName = topicName
+                    )
+                },
+                onError = { stateController.sendEvent(ChatEvents.Internal.OnError) }
+            )
         }
     }
 
@@ -120,7 +139,12 @@ class ChatViewModel @AssistedInject constructor(
                     }
 
                 },
-                onSuccess = {},
+                onSuccess = {
+                    subscribeOnMessagesFlow(
+                        streamName = streamName,
+                        topicName = topicName,
+                    )
+                },
                 onError = { stateController.sendEvent(ChatEvents.Internal.OnError) }
             )
         }

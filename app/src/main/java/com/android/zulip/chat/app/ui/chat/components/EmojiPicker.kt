@@ -1,5 +1,6 @@
 package com.android.zulip.chat.app.ui.chat.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.zulip.chat.app.domain.model.Emoji
+import com.android.zulip.chat.app.utils.toEmojiCode
+import com.android.zulip.chat.app.utils.toEmojiString
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -23,7 +26,8 @@ fun EmojiPicker(
     emojis: List<Emoji>,
     isPickerShow: Boolean,
     sheetState: SheetState = rememberModalBottomSheetState(),
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onClickEmojiInEmojiPicker: (emojiName: String) -> Unit
 ) {
     if (isPickerShow) {
         ModalBottomSheet(
@@ -34,7 +38,10 @@ fun EmojiPicker(
                     emojis.forEach {
                         Text(
                             text = String(Character.toChars(it.emojiCode)),
-                            fontSize = 30.sp
+                            fontSize = 30.sp,
+                            modifier = Modifier.clickable {
+                                onClickEmojiInEmojiPicker.invoke(it.emojiName)
+                            }
                         )
                     }
                 }
@@ -51,5 +58,7 @@ private fun ChatBottomBarPreview() {
     EmojiPicker(
         listOf(Emoji(emojiCode = 1, emojiName = "test")),
         isPickerShow = true,
-        onDismiss = {})
+        onDismiss = {},
+        onClickEmojiInEmojiPicker = {},
+    )
 }

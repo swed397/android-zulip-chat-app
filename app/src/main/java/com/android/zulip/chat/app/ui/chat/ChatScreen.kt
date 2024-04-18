@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,6 +36,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.zulip.chat.app.App
@@ -65,7 +68,6 @@ fun ChatScreenHolder(streamName: String, topicName: String) {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChatScreen(
     streamName: String,
@@ -102,7 +104,15 @@ private fun ChatScreen(
                                 )
                             )
                         },
-                        onDismissEmojiPicker = { onEvent.invoke(ChatEvents.Ui.CloseEmojiPicker) }
+                        onDismissEmojiPicker = { onEvent.invoke(ChatEvents.Ui.CloseEmojiPicker) },
+                        onAddNewEmoji = { emojiName, messageId ->
+                            onEvent.invoke(
+                                ChatEvents.Ui.AddNewEmoji(
+                                    emojiName = emojiName,
+                                    messageId = messageId
+                                )
+                            )
+                        }
                     )
 
                     is ChatUiState.Loading -> Preloader()
@@ -120,11 +130,15 @@ private fun MessagesList(
     onClickOnMessage: () -> Unit,
     onClickOnEmoji: (String, Long) -> Unit,
     onDismissEmojiPicker: () -> Unit,
+    onAddNewEmoji: (emojiName: String, messageId: Long) -> Unit
 ) {
+    var selectedMessage by remember { mutableLongStateOf(-1) }
+
     EmojiPicker(
         emojis = state.emojis ?: emptyList(),
         isPickerShow = state.openEmojiPicker,
-        onDismiss = onDismissEmojiPicker
+        onDismiss = onDismissEmojiPicker,
+        onClickEmojiInEmojiPicker = { onAddNewEmoji.invoke(it, selectedMessage) }
     )
 
     val coroutineScope = rememberCoroutineScope()
@@ -179,7 +193,10 @@ private fun MessagesList(
             items(items = state.messagesData, key = { it.messageId }) { message ->
                 MessageItem(
                     message = message,
-                    onClickOnMessage = onClickOnMessage,
+                    onClickOnMessage = {
+                        onClickOnMessage.invoke()
+                        selectedMessage = it
+                    },
                     onClickOnEmoji = onClickOnEmoji
                 )
                 HorizontalDivider(thickness = 20.dp, color = Color.Transparent)

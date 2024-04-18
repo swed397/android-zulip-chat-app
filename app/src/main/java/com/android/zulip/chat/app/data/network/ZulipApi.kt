@@ -73,6 +73,7 @@ interface ZulipApi {
     @POST("messages/{message_id}/reactions")
     suspend fun addEmojiByCode(
         @Path("message_id") messageId: Long,
+        @Query("emoji_name") emojiName: String,
         @Query("emoji_code") emojiCode: String
     ): ReactionRs
 }

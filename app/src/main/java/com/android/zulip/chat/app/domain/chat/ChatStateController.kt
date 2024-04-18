@@ -43,12 +43,21 @@ class ChatStateController @Inject constructor() :
                     )
                 }
 
-                ChatEvents.Ui.OpenEmojiPicker -> {
+                is ChatEvents.Ui.OpenEmojiPicker -> {
                     currentState to listOf(ChatAction.Internal.LoadEmojis)
                 }
 
-                ChatEvents.Ui.CloseEmojiPicker -> {
+                is ChatEvents.Ui.CloseEmojiPicker -> {
                     currentState to listOf(ChatAction.Internal.DetachEmojis)
+                }
+
+                is ChatEvents.Ui.AddNewEmoji -> {
+                    currentState to listOf(
+                        ChatAction.Internal.AddNewEmoji(
+                            emojiName = event.emojiName,
+                            messageId = event.messageId
+                        )
+                    )
                 }
             }
 
