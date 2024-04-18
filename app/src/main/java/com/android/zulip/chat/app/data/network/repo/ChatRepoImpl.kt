@@ -11,7 +11,6 @@ import com.android.zulip.chat.app.domain.mapper.toEntity
 import com.android.zulip.chat.app.domain.model.Emoji
 import com.android.zulip.chat.app.domain.model.MessageModel
 import com.android.zulip.chat.app.domain.repo.ChatRepo
-import com.android.zulip.chat.app.utils.toEmojiCode
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
